@@ -1,0 +1,111 @@
+{% extends 'base.html' %}
+
+{% block title %}Lista de Contas{% endblock %}
+
+{% block content %}
+
+    <div class="d-flex justify-content-between align-items-center" style="margin-bottom: 1rem;">
+        <h1>Lista de Contas</h1>
+        <a href="{{ url_for('add_conta') }}" class="btn btn-primary">Adicionar Conta</a>
+    </div>
+    <p class="total">Total Geral: <strong>{{ formatar_br(total_geral) }}</strong></p>
+
+
+    {# --- Total por Categoria (AGORA COM TABELA) --- #}
+
+    <h2>Totais por Categoria</h2>
+    <div class="table-responsive">
+        <table class="table table-striped table-hover">
+            <thead class="table">
+            <tr>
+                <th>Categoria</th>
+                <th>Total</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for categoria, total in total_por_categoria.items() %}
+                <tr>
+                    <td>{{ categoria }}</td>
+                    <td>{{ formatar_br(total) }}</td>
+                </tr>
+            {% else %}
+                <tr>
+                    <td colspan="2">Nenhuma conta cadastrada.</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {# --- Total por Vencimento (Tabela - já estava ok, mas com ajustes) --- #}
+    <h2>Totais por Vencimento</h2>
+    <div class="table-responsive">
+        <table class="table table-striped table-hover">
+            <thead class="table">
+            <tr>
+                <th>Vencimento</th>
+                <th>Total</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for vencimento_str, total in total_por_vencimento.items()|sort %}
+                <tr>
+                    <td>{{ vencimento_str }}</td>
+                    <td>{{ formatar_br(total) }}</td>
+                </tr>
+            {% else %}
+                <tr>
+                    <td colspan="2">Nenhuma conta cadastrada.</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {# --- Tabela de Contas por Categoria (já existia) --- #}
+    {% for categoria, contas in contas_por_categoria.items() %}
+        <h2>{{ categoria }}</h2>
+        <table class="table">
+            <thead>
+            <tr>
+                <th>Nome</th>
+                <th>Valor</th>
+                <th>Vencimento</th>
+                <th>Parcela</th>
+                <th>Recorrente</th>
+                <th>Tipo de Pagamento</th>
+                <th></th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for conta in contas %}
+                <tr>
+                    <td>{{ conta.nome }}</td>
+                    <td>{{ formatar_br(conta.valor) }}</td>
+                    <td>{{ conta.vencimento.strftime('%d/%m/%Y') if conta.vencimento else 'N/A' }}</td>
+                    <td>{{ conta.get_parcela_display() }}</td>
+                    <td>{{ 'Sim' if conta.recorrente else 'Não' }}</td>
+                    <td>
+                        {% if conta.tipo_pagamento_id %}
+                            {% set tipo = get_tipo_pagamento_by_id(conta.tipo_pagamento_id) %}
+                            {{ tipo.nome if tipo else 'N/A' }}
+                        {% else %}
+                            N/A
+                        {% endif %}
+                    </td>
+                    <td>
+                        <a href="{{ url_for('edit_conta', id=conta.id) }}"
+                           class="btn btn-sm btn-outline-primary">Editar</a>
+                        <form action="{{ url_for('delete_conta', id=conta.id) }}" method="post"
+                              style="display: inline;">
+                            <button type="submit" class="btn btn-sm btn-outline-danger"
+                                    onclick="return confirm('Tem certeza que deseja excluir esta conta?');">Excluir
+                            </button>
+                        </form>
+
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+
+    {% endfor %}
+{% endblock %}

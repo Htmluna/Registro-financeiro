@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+
+{% block title %}Login{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center mt-5"> {# Row para centralizar a coluna #}
+    <div class="col-md-6 col-lg-5"> {# Define a largura da coluna (menor em telas grandes) #}
+        <div class="card shadow-sm"> {# Adiciona card com sombra sutil #}
+            <div class="card-body p-4"> {# Adiciona padding dentro do card #}
+                <h2 class="card-title text-center mb-4">Login</h2> {# Título centralizado #}
+                <form method="POST" novalidate> {# novalidate desativa validação HTML padrão #}
+                    {{ form.hidden_tag() }}
+                    <div class="form-group mb-3"> {# Aumenta margem inferior #}
+                        {{ form.username.label(class="form-label") }} {# Usa classe form-label #}
+                        {{ form.username(class="form-control form-control-lg") }} {# Input maior #}
+                        {% if form.username.errors %}
+                            <div class="invalid-feedback d-block"> {# Mostra erro abaixo #}
+                                {% for error in form.username.errors %}
+                                    <span>{{ error }}</span>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                    <div class="form-group mb-4"> {# Aumenta margem inferior #}
+                        {{ form.password.label(class="form-label") }}
+                        {{ form.password(class="form-control form-control-lg") }} {# Input maior #}
+                         {% if form.password.errors %}
+                            <div class="invalid-feedback d-block">
+                                {% for error in form.password.errors %}
+                                    <span>{{ error }}</span>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                    <div class="d-grid gap-2 mb-3"> {# Usa d-grid para botão de bloco moderno #}
+                         {{ form.submit(class="btn btn-primary btn-lg") }} {# Botão maior #}
+                    </div>
+                    <p class="text-center mt-3">
+                        Não tem uma conta? <a href="{{ url_for('register') }}">Registre-se</a>.
+                    </p>
+                     {# Link opcional para reset de senha #}
+                    <p class="text-center mt-2">
+                        <a href="{{ url_for('reset_password') }}">Esqueceu a senha?</a>
+                    </p>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

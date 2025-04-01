@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+
+{% block title %}Selecionar Relatório Mensal{% endblock %}
+
+{% block content %}
+    <h1>Selecionar Período e Categorias para Relatório</h1>
+
+    <form method="GET" action="{{ url_for('visualizar_relatorio_mensal') }}" class="mb-4">
+        {# --- Seleção de Mês e Ano (como antes) --- #}
+        <div class="form-row align-items-end mb-3">
+            <div class="col-md-3">
+                <label for="mes">Mês:</label>
+                <select name="mes" id="mes" class="form-control" required>
+                    {% for num, nome in meses %}
+                        {# Pré-seleciona o mês atual se for a primeira vez #}
+                        <option value="{{ num }}" {% if not request.args.get('mes') and num == mes_atual %}selected{% endif %}>{{ nome }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label for="ano">Ano:</label>
+                <select name="ano" id="ano" class="form-control" required>
+                    {% for ano_opcao in anos %}
+                     {# Pré-seleciona o ano atual se for a primeira vez #}
+                        <option value="{{ ano_opcao }}" {% if not request.args.get('ano') and ano_opcao == ano_atual %}selected{% endif %}>{{ ano_opcao }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+
+        {# --- Seleção de Categorias (NOVO) --- #}
+        <div class="form-group mb-3">
+            <label>Categorias (deixe desmarcado para incluir todas):</label>
+            <div style="max-height: 150px; overflow-y: auto; border: 1px solid #ced4da; padding: 10px; border-radius: .25rem;">
+                {% if categorias_disponiveis %}
+                    {% for categoria in categorias_disponiveis %}
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" name="categoria" value="{{ categoria }}" id="cat-{{ loop.index }}">
+                            <label class="form-check-label" for="cat-{{ loop.index }}">
+                                {{ categoria }}
+                            </label>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <p class="text-muted">Nenhuma categoria encontrada.</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Gerar Relatório</button>
+        <a href="{{ url_for('index') }}" class="btn btn-secondary ml-2">Voltar para Dashboard</a>
+    </form>
+
+{% endblock %}

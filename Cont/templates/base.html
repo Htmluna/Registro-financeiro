@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}Gestão Financeira{% endblock %}</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <!-- Font Awesome para Ícones -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #4682B4; /* Steel Blue */
+            --primary-darker: #36648B; /* Darker Steel Blue */
+            --sidebar-bg: #343a40; /* Dark Gray */
+            --sidebar-text: #f8f9fa; /* Light Gray/White */
+            --sidebar-hover-bg: #495057; /* Medium Gray */
+            --body-bg: #f4f7f6; /* Very light gray/off-white */
+            --text-color: #212529; /* Bootstrap default dark text */
+            --heading-color: var(--primary-darker);
+            --card-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075); /* Subtle shadow */
+        }
+
+        body {
+            background-color: var(--body-bg);
+            color: var(--text-color);
+            display: flex;
+            min-height: 100vh;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+        }
+
+        .sidebar {
+            background-color: var(--sidebar-bg);
+            color: var(--sidebar-text);
+            padding: 20px 15px; /* Ajuste padding */
+            width: 250px;
+            flex-shrink: 0;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sidebar-header {
+             padding-bottom: 1rem;
+             margin-bottom: 1rem;
+             border-bottom: 1px solid var(--sidebar-hover-bg);
+        }
+
+         .sidebar-header h2 {
+            color: var(--sidebar-text);
+            margin-bottom: 0;
+            font-size: 1.5rem;
+            text-align: center;
+         }
+
+        .sidebar-menu {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            flex-grow: 1; /* Faz o menu ocupar espaço */
+        }
+
+        .sidebar-menu li {
+            margin-bottom: 8px; /* Espaçamento entre itens */
+        }
+
+        .sidebar-menu a {
+            color: var(--sidebar-text);
+            text-decoration: none;
+            display: flex; /* Alinha ícone e texto */
+            align-items: center; /* Centraliza verticalmente */
+            padding: 10px 15px; /* Mais padding */
+            border-radius: 5px;
+            transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
+            font-size: 0.95rem;
+        }
+
+        .sidebar-menu a .fas { /* Estilo para ícones */
+            margin-right: 12px; /* Espaço entre ícone e texto */
+            width: 20px; /* Largura fixa para alinhamento */
+            text-align: center;
+        }
+
+        .sidebar-menu a:hover, .sidebar-menu a.active { /* Estilo hover e ativo */
+            background-color: var(--sidebar-hover-bg);
+            color: #fff; /* Texto branco no hover */
+        }
+
+        .sidebar-footer {
+            margin-top: auto; /* Empurra para baixo */
+            padding-top: 1rem;
+            border-top: 1px solid var(--sidebar-hover-bg);
+        }
+
+        .content {
+            flex-grow: 1;
+            padding: 25px; /* Mais padding no conteúdo */
+            overflow-y: auto; /* Scroll se necessário */
+        }
+
+        .navbar {
+            background-color: #ffffff !important; /* Navbar branca */
+            border-bottom: 1px solid #dee2e6; /* Linha sutil abaixo */
+            box-shadow: var(--card-shadow);
+            margin-bottom: 1.5rem !important; /* Mais espaço abaixo */
+        }
+
+        .navbar-brand {
+            color: var(--primary-darker) !important; /* Cor primária escura no brand */
+            font-weight: 600;
+        }
+
+        .navbar-text {
+            color: var(--text-color) !important; /* Texto padrão na navbar */
+        }
+
+        /* Botões */
+        .btn-primary {
+            background-color: var(--primary-color) !important;
+            border-color: var(--primary-color) !important;
+            color: white !important;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-darker) !important;
+            border-color: var(--primary-darker) !important;
+        }
+         /* Ajuste para botões outline */
+        .btn-outline-primary {
+            color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+        .btn-outline-primary:hover {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        .btn-outline-danger { color: #dc3545; border-color: #dc3545; }
+        .btn-outline-danger:hover { background-color: #dc3545; color: white; }
+        .btn-secondary { background-color: #6c757d; border-color: #6c757d; color: white; }
+        .btn-secondary:hover { background-color: #5a6268; border-color: #545b62; }
+
+        /* Títulos */
+        h1, h2, h3 {
+            color: var(--heading-color);
+            margin-bottom: 1rem;
+            font-weight: 500;
+        }
+        h1 { font-size: 2rem; margin-bottom: 1.5rem;}
+        h2 { font-size: 1.6rem; margin-top: 1.8rem; }
+        h3 { font-size: 1.3rem; margin-top: 1.5rem; }
+
+        /* Tabelas */
+        .table {
+            background-color: #fff; /* Fundo branco para tabelas */
+             box-shadow: var(--card-shadow);
+             border-radius: 0.25rem; /* Bordas arredondadas */
+        }
+        .table thead th {
+            background-color: #e9ecef; /* Cabeçalho cinza claro */
+            border-bottom: 2px solid #dee2e6;
+            font-weight: 600;
+            color: var(--text-color);
+        }
+         .table-hover tbody tr:hover {
+            background-color: #f8f9fa; /* Hover suave */
+        }
+        td, th {
+             vertical-align: middle !important; /* Alinha verticalmente */
+        }
+
+        /* Cards (Blocos com Sombra) */
+        .card {
+            box-shadow: var(--card-shadow);
+            border: none; /* Remove borda padrão se usar sombra */
+            margin-bottom: 1.5rem; /* Espaçamento entre cards */
+        }
+        .card-header {
+            background-color: #f8f9fa; /* Fundo levemente cinza */
+            border-bottom: 1px solid rgba(0,0,0,.125);
+            font-weight: 600;
+            color: var(--heading-color);
+        }
+
+        /* Alertas (Usando cores padrão Bootstrap) */
+        .alert {
+            box-shadow: var(--card-shadow);
+            border-left: 5px solid; /* Borda lateral colorida */
+            border-radius: 0.25rem;
+        }
+        .alert-success { border-left-color: #28a745; }
+        .alert-info    { border-left-color: #17a2b8; }
+        .alert-warning { border-left-color: #ffc107; }
+        .alert-danger  { border-left-color: #dc3545; }
+        .alert-error   { border-left-color: #dc3545; } /* Alias para danger */
+
+        p.total {
+            font-size: 1.5rem;
+            color: var(--heading-color);
+            margin-bottom: 1.5rem;
+        }
+
+        /* Ajuste para formulários */
+        label {
+            font-weight: 500;
+            margin-bottom: .5rem;
+        }
+
+        .form-control:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 0.2rem rgba(70, 130, 180, 0.25); /* Sombra no foco com cor primária */
+        }
+
+    </style>
+</head>
+<body>
+{% if current_user.is_authenticated %}
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <h2>Navegação</h2>
+        </div>
+        <ul class="sidebar-menu">
+            {# Adicione a classe 'active' ao link da página atual se souber como fazer com Flask/Jinja #}
+            <li><a href="{{ url_for('index') }}"><i class="fas fa-tachometer-alt"></i>Dashboard</a></li>
+            <li><a href="{{ url_for('add_conta') }}"><i class="fas fa-plus-circle"></i>Adicionar Conta</a></li>
+            <li><a href="{{ url_for('listar_cartoes') }}"><i class="fas fa-credit-card"></i>Cartões</a></li>
+            <li><a href="{{ url_for('listar_contas_bancarias') }}"><i class="fas fa-landmark"></i>Contas Bancárias</a></li>
+            <li><a href="{{ url_for('selecionar_relatorio') }}"><i class="fas fa-chart-bar"></i>Relatório Mensal</a></li>
+            <li><a href="{{ url_for('reset_password') }}"><i class="fas fa-key"></i>Alterar Senha</a></li>
+            <li><a href="{{ url_for('logout') }}"><i class="fas fa-sign-out-alt"></i>Sair</a></li>
+        </ul>
+    </div>
+{% endif %}
+
+<div class="content">
+    {# Navbar movida para dentro do .content para layout mais comum #}
+    <nav class="navbar navbar-expand-lg navbar-light"> {# Mudado para navbar-light #}
+        <a class="navbar-brand" href="{{ url_for('index') }}">Gestão Financeira</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ml-auto">
+                {% if current_user.is_authenticated %}
+                    <li class="nav-item">
+                        <span class="navbar-text">
+                            Olá, {{ current_user.username }}!
+                        </span>
+                    </li>
+                {% else %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('login') }}">Entrar</a>
+                    </li>
+                {% endif %}
+            </ul>
+        </div>
+    </nav>
+
+    {# Container principal para o conteúdo e flash messages #}
+    <div class="container-fluid"> {# Usando container-fluid para ocupar mais espaço #}
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="messages mb-3"> {# Adiciona margem abaixo das mensagens #}
+                    {% for category, message in messages %}
+                        {# Mapeia categorias para classes de alerta Bootstrap #}
+                        {% set alert_class = 'alert-info' %} {# Padrão Info #}
+                        {% if category == 'success' %}
+                            {% set alert_class = 'alert-success' %}
+                        {% elif category == 'error' or category == 'danger' %}
+                            {% set alert_class = 'alert-danger' %}
+                        {% elif category == 'warning' %}
+                            {% set alert_class = 'alert-warning' %}
+                        {% endif %}
+                        <div class="alert {{ alert_class }} alert-dismissible fade show" role="alert">
+                            {{ message }}
+                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                <span aria-hidden="true">×</span>
+                            </button>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+
+        {% block content %}{% endblock %} {# O conteúdo da página será inserido aqui #}
+    </div>
+
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+{# Script opcional para ativar o link do menu atual (requer lógica adicional) #}
+<script>
+    // Adiciona a classe 'active' ao link da sidebar correspondente à URL atual
+    $(function() {
+        var currentPath = window.location.pathname;
+        $('.sidebar-menu a').each(function() {
+            var $this = $(this);
+            // Verifica se o href do link está contido no path atual
+            if (currentPath.indexOf($this.attr('href')) !== -1 && $this.attr('href') !== '/') {
+                 // Tratamento especial para a raiz '/' para não ativar sempre
+                 if (currentPath === '/' && $this.attr('href') === '/') {
+                     $this.addClass('active');
+                 } else if ($this.attr('href') !== '/') {
+                     $this.addClass('active');
+                     // Opcional: Se quiser apenas UM ativo, pode parar aqui ou adicionar lógica
+                 }
+            }
+            // Caso especial para ativar 'Dashboard' quando na raiz
+             if (currentPath === '/' && $this.attr('href') === '{{ url_for("index") }}') {
+                $this.addClass('active');
+            }
+        });
+    });
+</script>
+</body>
+</html>

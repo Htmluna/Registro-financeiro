@@ -1,0 +1,77 @@
+{% extends 'base.html' %}
+
+{% block title %}Adicionar Conta{% endblock %}
+
+{% block content %}
+
+    <h1>Adicionar Conta</h1>
+    <form method="POST">
+        {{ form.hidden_tag() }}
+        <div class="form-group">
+            {{ form.nome.label }}
+            {{ form.nome(class="form-control") }}
+            {% for error in form.nome.errors %}
+                <small class="text-danger">{{ error }}</small>
+            {% endfor %}
+        </div>
+        <div class="form-group">
+            {{ form.valor.label }}
+            {{ form.valor(class="form-control", id="valor", type="text") }}
+            {% for error in form.valor.errors %}
+                <small class="text-danger">{{ error }}</small>
+            {% endfor %}
+        </div>
+        <div class="form-group">
+            {{ form.vencimento.label }}
+            {{ form.vencimento(class="form-control") }}
+            {% for error in form.vencimento.errors %}
+                <small class="text-danger">{{ error }}</small>
+            {% endfor %}
+        </div>
+        <div class="form-group">
+            {{ form.categoria.label }}
+            {{ form.categoria(class="form-control") }}
+            {% for error in form.categoria.errors %}
+                <small class="text-danger">{{ error }}</small>
+            {% endfor %}
+        </div>
+        <div class="form-group">
+            {{ form.parcela_atual.label }}
+            {{ form.parcela_atual(class="form-control") }}
+            {% for error in form.parcela_atual.errors %}
+                <small class="text-danger">{{ error }}</small>
+            {% endfor %}
+        </div>
+        <div class="form-group">
+            {{ form.total_parcelas.label }}
+            {{ form.total_parcelas(class="form-control") }}
+            {% for error in form.total_parcelas.errors %}
+                <small class="text-danger">{{ error }}</small>
+            {% endfor %}
+        </div>
+        <div class="form-group form-check">
+            {{ form.recorrente(class="form-check-input") }}
+            {{ form.recorrente.label(class="form-check-label") }}
+            {% for error in form.recorrente.errors %}
+                <small class="text-danger">{{ error }}</small>
+            {% endfor %}
+        </div>
+        <div class="form-group">
+            {{ form.tipo_pagamento.label }}
+            {{ form.tipo_pagamento(class="form-control") }}
+            {% for error in form.tipo_pagamento.errors %}
+                <small class="text-danger">{{ error }}</small>
+            {% endfor %}
+        </div>
+        {{ form.submit(class="btn btn-primary") }}
+        <a href="{{ url_for('index') }}" class="btn btn-secondary">Cancelar</a>
+    </form>
+{% endblock %}
+
+{% block scripts %}
+    <script>
+      $(document).ready(function() {
+        $('#valor').mask('000.000.000.000.000,00', { reverse: true });
+      });
+    </script>
+{% endblock %}

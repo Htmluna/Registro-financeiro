@@ -1,0 +1,149 @@
+{% extends 'base.html' %}
+
+{% block title %}Relatório Mensal - {{ nome_mes }}/{{ ano }}{% endblock %}
+
+{% block content %}
+    <h1>Relatório Mensal - {{ nome_mes }} de {{ ano }}</h1>
+
+    <div class="mb-3">
+        <a href="{{ url_for('selecionar_relatorio') }}" class="btn btn-secondary btn-sm">Selecionar Outro Mês</a>
+    </div>
+
+    {# --- Resumo do Mês --- #}
+    <h2>Resumo do Mês</h2>
+    <p class="lead">Total Gasto no Mês: <strong>{{ formatar_br(total_mes) }}</strong></p>
+
+    {# Dentro de visualizar_relatorio_mensal.html, talvez após o H1 #}
+    {% if selected_categories %}
+        <div class="alert alert-info alert-dismissible fade show" role="alert">
+          <strong>Filtro ativo:</strong> Exibindo apenas categorias:
+          {# CORRIGIDO: Usa um loop para criar badges individuais #}
+          {% for categoria in selected_categories %}
+              <span class="badge badge-secondary mr-1">{{ categoria }}</span>
+          {% endfor %}
+          <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">×</span>
+          </button>
+        </div>
+    {% endif %}
+
+    {% if total_por_categoria_mes %}
+        <h3>Totais por Categoria ({{ nome_mes }}/{{ ano }})</h3>
+        <div class="table-responsive mb-4">
+            <table class="table table-striped table-sm">
+                <thead class="thead-light">
+                <tr>
+                    <th>Categoria</th>
+                    <th>Total</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for categoria, total in total_por_categoria_mes.items()|sort %}
+                    <tr>
+                        <td>{{ categoria }}</td>
+                        <td>{{ formatar_br(total) }}</td>
+                    </tr>
+                {% else %}
+                    <tr>
+                        <td colspan="2">Nenhuma categoria encontrada.</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% endif %}
+
+    {# --- Detalhes das Contas do Mês --- #}
+    <h2>Detalhes das Contas</h2>
+    <div class="report-container table-responsive mb-4">
+        <table class="table table-bordered table-hover table-sm">
+            <thead class="thead-light">
+                <tr>
+                    <th>Nome</th>
+                    <th>Valor</th>
+                    <th>Vencimento</th>
+                    <th>Categoria</th>
+                    <th>Parcela</th>
+                    <th>Tipo de Pagamento</th>
+                    {# Adicione mais colunas se relevante #}
+                </tr>
+            </thead>
+            <tbody>
+                {% for conta in contas_mes %}
+                    <tr>
+                        <td>{{ conta.nome }}</td>
+                        <td>{{ formatar_br(conta.valor) }}</td>
+                        <td>{{ conta.vencimento.strftime('%d/%m/%Y') if conta.vencimento else 'N/A' }}</td>
+                        <td>{{ conta.categoria }}</td>
+                        <td>{{ conta.get_parcela_display() }}</td>
+                        <td>
+                            {% if conta.tipo_pagamento_id %}
+                                {% set tipo = get_tipo_pagamento_by_id(conta.tipo_pagamento_id) %}
+                                {{ tipo.nome if tipo else 'N/A' }}
+                            {% else %}
+                                N/A
+                            {% endif %}
+                        </td>
+                        {# Renderize mais dados da 'conta' aqui se necessário #}
+                    </tr>
+                {% else %}
+                    <tr>
+                        <td colspan="6" class="text-center">Nenhuma conta encontrada para este período.</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    {# --- Rodapé com Total e Botão Imprimir --- #}
+    <div class="report-footer mt-4">
+         <p class="total-time" style="font-size: 1.1rem;"><strong>Total Geral do Mês: {{ formatar_br(total_mes) }}</strong></p>
+         <button onclick="window.print()" class="btn btn-info print-button">
+             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-printer-fill" viewBox="0 0 16 16">
+                 <path d="M5 1a2 2 0 0 0-2 2v1h10V3a2 2 0 0 0-2-2H5zm6 8H5a1 1 0 0 0-1 1v3a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1v-3a1 1 0 0 0-1-1z"/>
+                 <path d="M0 7a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2h-1v-2a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v2H2a2 2 0 0 1-2-2V7zm2.5 1a.5.5 0 1 0 0-1 .5.5 0 0 0 0 1z"/>
+             </svg>
+             Imprimir Relatório
+         </button>
+    </div>
+
+    {# --- Estilo para Impressão (Opcional, mas recomendado) --- #}
+    <style>
+        @media print {
+            body * {
+                visibility: hidden; /* Esconde tudo por padrão */
+            }
+            .content, .content * { /* Seleciona a div de conteúdo principal */
+                visibility: visible; /* Torna visível apenas o conteúdo */
+            }
+            .content {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+                padding: 10px; /* Ajuste o padding para impressão */
+            }
+            /* Esconder elementos não desejados na impressão */
+            .sidebar, .navbar, .btn, .alert, form, .print-button, .btn-secondary, .mb-3 {
+                display: none !important;
+            }
+            table {
+                width: 100%;
+                border-collapse: collapse;
+            }
+            th, td {
+                border: 1px solid #ddd;
+                padding: 4px;
+                font-size: 10pt; /* Tamanho menor para caber mais */
+            }
+            thead {
+                display: table-header-group; /* Garante que o cabeçalho repita em páginas */
+            }
+            h1, h2, h3, p {
+                 color: #000 !important; /* Garante cor preta na impressão */
+                 margin-bottom: 0.5rem;
+            }
+        }
+    </style>
+
+{% endblock %}
