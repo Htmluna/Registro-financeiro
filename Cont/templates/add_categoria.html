@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ title | default('Adicionar Categoria') }}{% endblock %}
+
+{% block content %}
+
+<h1>{{ title | default('Adicionar Categoria') }}</h1>
+
+{# Determine action URL based on whether 'categoria' object exists #}
+{% set action_url = url_for('edit_categoria', id=categoria.id) if categoria else url_for('add_categoria') %}
+
+<form method="POST" action="{{ action_url }}">
+    {{ form.hidden_tag() }}
+
+    <div class="form-group">
+        {{ form.nome.label(class="form-label") }}
+        {{ form.nome(class="form-control" + (" is-invalid" if form.nome.errors else "")) }}
+        {% if form.nome.errors %}
+            <div class="invalid-feedback">
+                {% for error in form.nome.errors %}
+                    <span>{{ error }}</span>
+                {% endfor %}
+            </div>
+        {% endif %}
+    </div>
+
+    {{ form.submit(class="btn btn-primary") }}
+    <a href="{{ url_for('listar_categorias') }}" class="btn btn-secondary">Cancelar</a>
+</form>
+
+{% endblock %}

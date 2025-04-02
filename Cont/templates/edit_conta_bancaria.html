@@ -1,36 +1,80 @@
+{# Indica que este template herda a estrutura e blocos do template 'base.html'. #}
 {% extends 'base.html' %}
 
+{# Define o título da página, que aparecerá na aba do navegador (substitui o bloco 'title' em base.html). #}
 {% block title %}Editar Conta Bancária{% endblock %}
 
+{# Início do bloco principal de conteúdo ('content'), onde o formulário de edição será renderizado. #}
 {% block content %}
 
+    <!-- Título principal visível na página. -->
     <h1>Editar Conta Bancária</h1>
 
+    <!-- Início do formulário. method='POST' envia os dados atualizados ao servidor. -->
     <form method="POST">
+        {# Renderiza campos ocultos, como o token CSRF para segurança, e talvez o ID da conta sendo editada. #}
         {{ form.hidden_tag() }}
+
+        <!-- Agrupamento para o campo 'nome' (label, input, erros) usando classes Bootstrap. -->
         <div class="form-group">
+            {# Renderiza a tag <label> associada ao campo 'nome'. #}
             {{ form.nome.label }}
+            {# Renderiza o campo de input (<input>) para 'nome'.
+               - class="form-control": Aplica estilo padrão do Bootstrap.
+               - value=conta_bancaria.nome: Pré-preenche o campo com o nome atual da conta bancária.
+                 (Assume que um objeto 'conta_bancaria' foi passado do backend). #}
             {{ form.nome(class="form-control", value=conta_bancaria.nome) }}
+            {# Loop para exibir quaisquer erros de validação associados ao campo 'nome' após a submissão. #}
             {% for error in form.nome.errors %}
+                <!-- Exibe a mensagem de erro em texto pequeno e vermelho (classe Bootstrap 'text-danger'). -->
                 <small class="text-danger">{{ error }}</small>
-            {% endfor %}
+            {% endfor %} {# Fim do loop de erros para 'nome'. #}
         </div>
+
+        <!-- Agrupamento para o campo 'saldo'. -->
         <div class="form-group">
+            {# Renderiza a tag <label> para o campo 'saldo'. #}
             {{ form.saldo.label }}
-            {{ form.saldo(class="form-control", value=conta_bancaria.saldo, id="saldo", type="text") }}  {# Adicionado type="text" e corrigido #}
+            {# Renderiza o campo de input (<input>) para 'saldo'.
+               - class="form-control": Estilo Bootstrap.
+               - value=conta_bancaria.saldo: Pré-preenche o campo com o saldo atual da conta.
+               - id="saldo": ID único para que o JavaScript possa selecionar este campo e aplicar a máscara.
+               - type="text": Define o tipo como texto para permitir a aplicação da máscara de formatação monetária. #}
+            {{ form.saldo(class="form-control", value=conta_bancaria.saldo, id="saldo", type="text") }}
+            {# Loop para exibir erros de validação do campo 'saldo'. #}
             {% for error in form.saldo.errors %}
+                <!-- Exibe a mensagem de erro para o saldo. -->
                 <small class="text-danger">{{ error }}</small>
-            {% endfor %}
+            {% endfor %} {# Fim do loop de erros para 'saldo'. #}
         </div>
+
+        {# Renderiza o botão de submissão do formulário (ex: "Salvar Alterações"). 'btn btn-primary' aplica estilo Bootstrap. #}
         {{ form.submit(class="btn btn-primary") }}
+        <!-- Link (estilizado como botão secundário) para cancelar a edição e voltar para a lista de contas bancárias.
+             `url_for('listar_contas_bancarias')` gera dinamicamente o URL da rota correspondente. -->
         <a href="{{ url_for('listar_contas_bancarias') }}" class="btn btn-secondary">Cancelar</a>
+    <!-- Fim do formulário. -->
     </form>
+{# Fim do bloco 'content'. #}
 {% endblock %}
 
+{# Início do bloco 'scripts', onde o JavaScript específico desta página é adicionado (geralmente no final do <body> em base.html). #}
 {% block scripts %}
+    <!-- Início do script JavaScript. -->
     <script>
+      // Executa o código quando o documento HTML estiver completamente carregado (usando jQuery).
       $(document).ready(function() {
+        // Seleciona o campo de input com id 'saldo' e aplica a máscara de formatação monetária brasileira.
+        // (Requer o plugin jQuery Mask: https://igorescobar.github.io/jQuery-Mask-Plugin/)
+        // '000.000.000.000.000,00' é o padrão da máscara.
+        // 'reverse: true' facilita a digitação de valores (da direita para a esquerda).
         $('#saldo').mask('000.000.000.000.000,00', { reverse: true });
+
+        // (Opcional mas recomendado) Dispara um evento 'input' no campo após aplicar a máscara.
+        // Isso força a máscara a reformatar o valor inicial que foi pré-preenchido no campo.
+        $('#saldo').trigger('input');
       });
     </script>
+    <!-- Fim do script JavaScript. -->
+{# Fim do bloco 'scripts'. #}
 {% endblock %}

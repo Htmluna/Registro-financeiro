@@ -1,315 +1,447 @@
-<!DOCTYPE html>
-<html lang="pt-br">
-<head>
-    <meta charset="UTF-8">
-    <title>{% block title %}Gestão Financeira{% endblock %}</title>
+<!DOCTYPE html> <!-- Define o tipo de documento como HTML5 -->
+<html lang="pt-br"> <!-- Início do elemento HTML, define o idioma principal como Português Brasileiro -->
+<head> <!-- Contém metadados, links para CSS, scripts e o título da página -->
+    <meta charset="UTF-8"> <!-- Define a codificação de caracteres como UTF-8, suportando a maioria dos caracteres e símbolos -->
+    <title>{% block title %}Gestão Financeira{% endblock %}</title> <!-- Título da página exibido na aba do navegador. O bloco 'title' permite que páginas filhas definam um título específico, com "Gestão Financeira" como padrão. -->
+    <!-- Link para o CSS do Bootstrap a partir de um CDN (Content Delivery Network) para estilos base e componentes -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <!-- Font Awesome para Ícones -->
+    <!-- Link para o CSS do Font Awesome a partir de um CDN para usar ícones -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <!-- Início do bloco de estilos CSS internos -->
     <style>
+        /* Define variáveis CSS (custom properties) no escopo raiz (:root) para fácil customização do tema */
         :root {
-            --primary-color: #4682B4; /* Steel Blue */
-            --primary-darker: #36648B; /* Darker Steel Blue */
-            --sidebar-bg: #343a40; /* Dark Gray */
-            --sidebar-text: #f8f9fa; /* Light Gray/White */
-            --sidebar-hover-bg: #495057; /* Medium Gray */
-            --body-bg: #f4f7f6; /* Very light gray/off-white */
-            --text-color: #212529; /* Bootstrap default dark text */
-            --heading-color: var(--primary-darker);
-            --card-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075); /* Subtle shadow */
+            --primary-color: #4682B4; /* Steel Blue - Cor primária principal */
+            --primary-darker: #36648B; /* Steel Blue mais escuro - Usado para hover, títulos */
+            --sidebar-bg: #343a40; /* Cinza escuro - Cor de fundo da barra lateral */
+            --sidebar-text: #f8f9fa; /* Cinza claro/branco - Cor do texto na barra lateral */
+            --sidebar-hover-bg: #495057; /* Cinza médio - Fundo do item da barra lateral ao passar o mouse */
+            --body-bg: #f4f7f6; /* Cinza muito claro/quase branco - Fundo principal da página */
+            --text-color: #212529; /* Cor de texto padrão do Bootstrap (escuro) */
+            --heading-color: var(--primary-darker); /* Cor dos títulos (usa a variável primary-darker) */
+            --card-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075); /* Sombra sutil para elementos como cards */
         }
 
+        /* Estilos aplicados ao corpo (body) da página */
         body {
-            background-color: var(--body-bg);
-            color: var(--text-color);
-            display: flex;
-            min-height: 100vh;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+            background-color: var(--body-bg); /* Define a cor de fundo usando a variável */
+            color: var(--text-color); /* Define a cor do texto padrão usando a variável */
+            display: flex; /* Usa Flexbox para layout (permitir sidebar e conteúdo lado a lado) */
+            min-height: 100vh; /* Garante que o corpo ocupe pelo menos toda a altura da viewport */
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji"; /* Define uma pilha de fontes padrão moderna e segura */
         }
 
+        /* Estilos para a barra lateral (sidebar) */
         .sidebar {
-            background-color: var(--sidebar-bg);
-            color: var(--sidebar-text);
-            padding: 20px 15px; /* Ajuste padding */
-            width: 250px;
-            flex-shrink: 0;
-            display: flex;
-            flex-direction: column;
+            background-color: var(--sidebar-bg); /* Cor de fundo da sidebar */
+            color: var(--sidebar-text); /* Cor do texto da sidebar */
+            padding: 20px 15px; /* Espaçamento interno */
+            width: 250px; /* Largura fixa da sidebar */
+            flex-shrink: 0; /* Impede que a sidebar encolha quando o espaço for limitado */
+            display: flex; /* Usa Flexbox internamente */
+            flex-direction: column; /* Organiza os itens da sidebar em coluna */
         }
 
+        /* Estilos para o cabeçalho da sidebar */
         .sidebar-header {
-             padding-bottom: 1rem;
-             margin-bottom: 1rem;
-             border-bottom: 1px solid var(--sidebar-hover-bg);
+             padding-bottom: 1rem; /* Espaçamento abaixo */
+             margin-bottom: 1rem; /* Margem abaixo */
+             border-bottom: 1px solid var(--sidebar-hover-bg); /* Linha divisória sutil */
         }
 
+         /* Estilos para o título (h2) dentro do cabeçalho da sidebar */
          .sidebar-header h2 {
-            color: var(--sidebar-text);
-            margin-bottom: 0;
-            font-size: 1.5rem;
-            text-align: center;
+            color: var(--sidebar-text); /* Cor do texto */
+            margin-bottom: 0; /* Remove margem inferior padrão do h2 */
+            font-size: 1.5rem; /* Tamanho da fonte */
+            text-align: center; /* Centraliza o texto */
          }
 
+        /* Estilos para a lista (menu) da sidebar */
         .sidebar-menu {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-            flex-grow: 1; /* Faz o menu ocupar espaço */
+            list-style: none; /* Remove marcadores de lista (bolinhas) */
+            padding: 0; /* Remove padding padrão da lista */
+            margin: 0; /* Remove margem padrão da lista */
+            flex-grow: 1; /* Faz o menu ocupar o espaço vertical disponível */
         }
 
+        /* Estilos para os itens (li) do menu da sidebar */
         .sidebar-menu li {
-            margin-bottom: 8px; /* Espaçamento entre itens */
+            margin-bottom: 8px; /* Espaçamento entre os itens do menu */
         }
 
+        /* Estilos para os links (a) dentro do menu da sidebar */
         .sidebar-menu a {
-            color: var(--sidebar-text);
-            text-decoration: none;
-            display: flex; /* Alinha ícone e texto */
-            align-items: center; /* Centraliza verticalmente */
-            padding: 10px 15px; /* Mais padding */
-            border-radius: 5px;
-            transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
-            font-size: 0.95rem;
+            color: var(--sidebar-text); /* Cor do texto do link */
+            text-decoration: none; /* Remove sublinhado do link */
+            display: flex; /* Usa Flexbox para alinhar ícone e texto */
+            align-items: center; /* Centraliza verticalmente ícone e texto */
+            padding: 10px 15px; /* Espaçamento interno do link */
+            border-radius: 5px; /* Bordas arredondadas */
+            transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out; /* Transição suave para hover */
+            font-size: 0.95rem; /* Tamanho da fonte ligeiramente menor */
         }
 
-        .sidebar-menu a .fas { /* Estilo para ícones */
-            margin-right: 12px; /* Espaço entre ícone e texto */
-            width: 20px; /* Largura fixa para alinhamento */
-            text-align: center;
+        /* Estilos para os ícones (Font Awesome) dentro dos links do menu */
+        .sidebar-menu a .fas {
+            margin-right: 12px; /* Espaço à direita do ícone */
+            width: 20px; /* Largura fixa para garantir alinhamento dos textos */
+            text-align: center; /* Centraliza o ícone dentro da sua largura fixa */
         }
 
-        .sidebar-menu a:hover, .sidebar-menu a.active { /* Estilo hover e ativo */
-            background-color: var(--sidebar-hover-bg);
-            color: #fff; /* Texto branco no hover */
+        /* Estilos para o link quando o mouse está sobre ele (:hover) ou quando ele está ativo (.active) */
+        .sidebar-menu a:hover, .sidebar-menu a.active {
+            background-color: var(--sidebar-hover-bg); /* Muda a cor de fundo */
+            color: #fff; /* Muda a cor do texto para branco */
         }
 
+        /* Estilos para o rodapé da sidebar (se houver) */
         .sidebar-footer {
-            margin-top: auto; /* Empurra para baixo */
-            padding-top: 1rem;
-            border-top: 1px solid var(--sidebar-hover-bg);
+            margin-top: auto; /* Empurra o rodapé para a parte inferior da sidebar */
+            padding-top: 1rem; /* Espaçamento acima */
+            border-top: 1px solid var(--sidebar-hover-bg); /* Linha divisória acima */
         }
 
+        /* Estilos para a área de conteúdo principal */
         .content {
-            flex-grow: 1;
-            padding: 25px; /* Mais padding no conteúdo */
-            overflow-y: auto; /* Scroll se necessário */
+            flex-grow: 1; /* Faz a área de conteúdo ocupar todo o espaço restante */
+            padding: 25px; /* Espaçamento interno generoso */
+            overflow-y: auto; /* Adiciona barra de rolagem vertical se o conteúdo exceder a altura */
         }
 
+        /* Estilos para a barra de navegação superior (navbar) */
         .navbar {
-            background-color: #ffffff !important; /* Navbar branca */
-            border-bottom: 1px solid #dee2e6; /* Linha sutil abaixo */
-            box-shadow: var(--card-shadow);
-            margin-bottom: 1.5rem !important; /* Mais espaço abaixo */
+            background-color: #ffffff !important; /* Fundo branco (importante para sobrescrever Bootstrap) */
+            border-bottom: 1px solid #dee2e6; /* Linha divisória inferior sutil */
+            box-shadow: var(--card-shadow); /* Aplica a sombra definida na variável */
+            margin-bottom: 1.5rem !important; /* Margem inferior (importante para sobrescrever Bootstrap) */
         }
 
+        /* Estilo para o 'brand' (logo/título) da navbar */
         .navbar-brand {
-            color: var(--primary-darker) !important; /* Cor primária escura no brand */
-            font-weight: 600;
+            color: var(--primary-darker) !important; /* Cor do texto usando variável (importante) */
+            font-weight: 600; /* Peso da fonte semi-negrito */
         }
 
+        /* Estilo para texto comum dentro da navbar */
         .navbar-text {
-            color: var(--text-color) !important; /* Texto padrão na navbar */
+            color: var(--text-color) !important; /* Cor do texto usando variável (importante) */
         }
 
-        /* Botões */
+        /* --- Estilos para Botões --- */
+        /* Botão primário (azul) */
         .btn-primary {
-            background-color: var(--primary-color) !important;
-            border-color: var(--primary-color) !important;
-            color: white !important;
+            background-color: var(--primary-color) !important; /* Cor de fundo (importante) */
+            border-color: var(--primary-color) !important; /* Cor da borda (importante) */
+            color: white !important; /* Cor do texto (importante) */
         }
-
+        /* Hover do botão primário */
         .btn-primary:hover {
-            background-color: var(--primary-darker) !important;
-            border-color: var(--primary-darker) !important;
+            background-color: var(--primary-darker) !important; /* Cor de fundo mais escura no hover */
+            border-color: var(--primary-darker) !important; /* Cor da borda mais escura no hover */
         }
-         /* Ajuste para botões outline */
+        /* Botão primário outline (contorno) */
         .btn-outline-primary {
-            color: var(--primary-color);
-            border-color: var(--primary-color);
+            color: var(--primary-color); /* Cor do texto */
+            border-color: var(--primary-color); /* Cor da borda */
         }
         .btn-outline-primary:hover {
-            background-color: var(--primary-color);
-            color: white;
+            background-color: var(--primary-color); /* Fundo preenchido no hover */
+            color: white; /* Texto branco no hover */
         }
+        /* Botão de perigo (vermelho) outline */
         .btn-outline-danger { color: #dc3545; border-color: #dc3545; }
         .btn-outline-danger:hover { background-color: #dc3545; color: white; }
+        /* Botão secundário (cinza) */
         .btn-secondary { background-color: #6c757d; border-color: #6c757d; color: white; }
         .btn-secondary:hover { background-color: #5a6268; border-color: #545b62; }
 
-        /* Títulos */
+        /* --- Estilos para Títulos --- */
         h1, h2, h3 {
-            color: var(--heading-color);
-            margin-bottom: 1rem;
-            font-weight: 500;
+            color: var(--heading-color); /* Cor definida pela variável */
+            margin-bottom: 1rem; /* Margem inferior padrão */
+            font-weight: 500; /* Peso da fonte médio */
         }
-        h1 { font-size: 2rem; margin-bottom: 1.5rem;}
-        h2 { font-size: 1.6rem; margin-top: 1.8rem; }
-        h3 { font-size: 1.3rem; margin-top: 1.5rem; }
+        h1 { font-size: 2rem; margin-bottom: 1.5rem; } /* Estilo específico para h1 */
+        h2 { font-size: 1.6rem; margin-top: 1.8rem; } /* Estilo específico para h2 */
+        h3 { font-size: 1.3rem; margin-top: 1.5rem; } /* Estilo específico para h3 */
 
-        /* Tabelas */
+        /* --- Estilos para Tabelas --- */
         .table {
             background-color: #fff; /* Fundo branco para tabelas */
-             box-shadow: var(--card-shadow);
-             border-radius: 0.25rem; /* Bordas arredondadas */
+             box-shadow: var(--card-shadow); /* Sombra sutil */
+             border-radius: 0.25rem; /* Bordas levemente arredondadas */
+             /* margin-bottom: 1.5rem; */ /* Adiciona espaço abaixo da tabela */
         }
+        /* Cabeçalho da tabela (thead) */
         .table thead th {
-            background-color: #e9ecef; /* Cabeçalho cinza claro */
-            border-bottom: 2px solid #dee2e6;
-            font-weight: 600;
-            color: var(--text-color);
+            background-color: #e9ecef; /* Fundo cinza claro para o cabeçalho */
+            border-bottom: 2px solid #dee2e6; /* Borda inferior mais espessa */
+            font-weight: 600; /* Texto do cabeçalho semi-negrito */
+            color: var(--text-color); /* Cor do texto padrão */
         }
+         /* Efeito hover nas linhas do corpo da tabela */
          .table-hover tbody tr:hover {
-            background-color: #f8f9fa; /* Hover suave */
+            background-color: #f8f9fa; /* Fundo levemente acinzentado no hover */
         }
+        /* Células da tabela (td e th) */
         td, th {
-             vertical-align: middle !important; /* Alinha verticalmente */
+             vertical-align: middle !important; /* Alinha o conteúdo verticalmente ao centro (importante) */
         }
 
-        /* Cards (Blocos com Sombra) */
+        /* --- Estilos para Cards (blocos de conteúdo com sombra) --- */
         .card {
-            box-shadow: var(--card-shadow);
-            border: none; /* Remove borda padrão se usar sombra */
-            margin-bottom: 1.5rem; /* Espaçamento entre cards */
+            box-shadow: var(--card-shadow); /* Aplica a sombra definida */
+            border: none; /* Remove a borda padrão do Bootstrap (opcional, se a sombra for suficiente) */
+            margin-bottom: 1.5rem; /* Espaçamento abaixo do card */
         }
+        /* Cabeçalho do card */
         .card-header {
             background-color: #f8f9fa; /* Fundo levemente cinza */
-            border-bottom: 1px solid rgba(0,0,0,.125);
-            font-weight: 600;
-            color: var(--heading-color);
+            border-bottom: 1px solid rgba(0,0,0,.125); /* Borda inferior padrão do Bootstrap */
+            font-weight: 600; /* Texto semi-negrito */
+            color: var(--heading-color); /* Cor do texto do título */
         }
 
-        /* Alertas (Usando cores padrão Bootstrap) */
+        /* --- Estilos para Alertas (mensagens) --- */
         .alert {
-            box-shadow: var(--card-shadow);
-            border-left: 5px solid; /* Borda lateral colorida */
-            border-radius: 0.25rem;
+            box-shadow: var(--card-shadow); /* Adiciona sombra aos alertas */
+            border-left: 5px solid; /* Adiciona uma borda colorida à esquerda */
+            border-radius: 0.25rem; /* Bordas arredondadas */
+            /* padding: 1rem 1.5rem; */ /* Ajuste opcional de padding */
         }
-        .alert-success { border-left-color: #28a745; }
-        .alert-info    { border-left-color: #17a2b8; }
-        .alert-warning { border-left-color: #ffc107; }
-        .alert-danger  { border-left-color: #dc3545; }
-        .alert-error   { border-left-color: #dc3545; } /* Alias para danger */
+        /* Define a cor da borda esquerda com base na classe do alerta */
+        .alert-success { border-left-color: #28a745; } /* Verde para sucesso */
+        .alert-info    { border-left-color: #17a2b8; } /* Azul para informação */
+        .alert-warning { border-left-color: #ffc107; } /* Amarelo para aviso */
+        .alert-danger  { border-left-color: #dc3545; } /* Vermelho para perigo/erro */
+        .alert-error   { border-left-color: #dc3545; } /* Alias para perigo (caso use 'error' como categoria) */
 
+        /* Estilo específico para parágrafos com a classe 'total' */
         p.total {
-            font-size: 1.5rem;
-            color: var(--heading-color);
-            margin-bottom: 1.5rem;
+            font-size: 1.5rem; /* Tamanho de fonte maior */
+            color: var(--heading-color); /* Cor do título */
+            margin-bottom: 1.5rem; /* Margem inferior */
         }
 
-        /* Ajuste para formulários */
+        /* --- Ajustes para Formulários --- */
+        /* Estilo para labels (rótulos) */
         label {
-            font-weight: 500;
-            margin-bottom: .5rem;
+            font-weight: 500; /* Peso da fonte médio */
+            margin-bottom: .5rem; /* Pequena margem inferior */
         }
 
+        /* Estilo para campos de formulário (.form-control) quando em foco */
         .form-control:focus {
-            border-color: var(--primary-color);
-            box-shadow: 0 0 0 0.2rem rgba(70, 130, 180, 0.25); /* Sombra no foco com cor primária */
+            border-color: var(--primary-color); /* Muda a cor da borda para a cor primária */
+            box-shadow: 0 0 0 0.2rem rgba(70, 130, 180, 0.25); /* Adiciona uma sombra de foco sutil com a cor primária (efeito 'glow') */
         }
 
-    </style>
+    </style> <!-- Fim do bloco de estilos CSS internos -->
 </head>
-<body>
-{% if current_user.is_authenticated %}
-    <div class="sidebar">
-        <div class="sidebar-header">
-            <h2>Navegação</h2>
-        </div>
-        <ul class="sidebar-menu">
-            {# Adicione a classe 'active' ao link da página atual se souber como fazer com Flask/Jinja #}
-            <li><a href="{{ url_for('index') }}"><i class="fas fa-tachometer-alt"></i>Dashboard</a></li>
-            <li><a href="{{ url_for('add_conta') }}"><i class="fas fa-plus-circle"></i>Adicionar Conta</a></li>
-            <li><a href="{{ url_for('listar_cartoes') }}"><i class="fas fa-credit-card"></i>Cartões</a></li>
-            <li><a href="{{ url_for('listar_contas_bancarias') }}"><i class="fas fa-landmark"></i>Contas Bancárias</a></li>
-            <li><a href="{{ url_for('selecionar_relatorio') }}"><i class="fas fa-chart-bar"></i>Relatório Mensal</a></li>
-            <li><a href="{{ url_for('reset_password') }}"><i class="fas fa-key"></i>Alterar Senha</a></li>
-            <li><a href="{{ url_for('logout') }}"><i class="fas fa-sign-out-alt"></i>Sair</a></li>
-        </ul>
-    </div>
-{% endif %}
+<body> <!-- Início do corpo do documento -->
 
+{# Bloco Jinja2: Verifica se o usuário atual está autenticado (logado). A sidebar só aparece para usuários logados. #}
+{% if current_user.is_authenticated %}
+    <!-- Container da barra lateral -->
+    <div class="sidebar">
+        <!-- Cabeçalho da barra lateral -->
+        <div class="sidebar-header">
+            <h2>Navegação</h2> <!-- Título da navegação -->
+        </div>
+        <!-- Lista (menu) de navegação da sidebar -->
+        <ul class="sidebar-menu">
+            {# Item do menu: Link para o Dashboard. `url_for('index')` gera o URL para a rota/view 'index'. #}
+                <li><a href="{{ url_for('dashboard') }}"><i class="fas fa-tachometer-alt"></i>Dashboard</a></li>
+            {# Item do menu: Link para adicionar conta. #}
+                <li><a href="{{ url_for('add_conta') }}"><i class="fas fa-plus-circle"></i>Adicionar Conta</a></li>
+            {# Item do menu: Link para listar categorias. #}
+                <li><a href="{{ url_for('listar_categorias') }}"><i class="fas fa-tags"></i>Categorias</a></li>
+            {# Item do menu: Link para listar cartões de crédito. #}
+                <li><a href="{{ url_for('listar_cartoes') }}"><i class="fas fa-credit-card"></i>Cartões</a></li>
+            {# Item do menu: Link para listar contas bancárias. #}
+                <li><a href="{{ url_for('listar_contas_bancarias') }}"><i class="fas fa-landmark"></i>Contas Bancárias</a></li>
+            {# Item do menu: Link para a página de seleção de relatório mensal. #}
+                <li><a href="{{ url_for('selecionar_relatorio') }}"><i class="fas fa-chart-bar"></i>Relatório Mensal</a></li>
+            {# Item do menu: Link para a página de alteração de senha. #}
+                <li><a href="{{ url_for('reset_password') }}"><i class="fas fa-key"></i>Alterar Senha</a></li>
+            {# Item do menu: Link para fazer logout. `url_for('logout')` gera o URL para a rota/view de logout. #}
+                <li><a href="{{ url_for('logout') }}"><i class="fas fa-sign-out-alt"></i>Sair</a></li>
+        </ul>
+        <!-- Opcional: Adicionar um sidebar-footer aqui se necessário -->
+    </div>
+{% endif %} {# Fim do bloco 'if current_user.is_authenticated' #}
+
+<!-- Container principal para o conteúdo da página (à direita da sidebar) -->
 <div class="content">
-    {# Navbar movida para dentro do .content para layout mais comum #}
-    <nav class="navbar navbar-expand-lg navbar-light"> {# Mudado para navbar-light #}
-        <a class="navbar-brand" href="{{ url_for('index') }}">Gestão Financeira</a>
+    {# A barra de navegação (navbar) superior, movida para dentro da área de conteúdo. #}
+    <nav class="navbar navbar-expand-lg navbar-light"> <!-- Navbar clara (fundo branco definido no CSS) -->
+        <!-- Brand/Logo da Navbar, linka para o index -->
+        <a class="navbar-brand" href="{{ url_for('dashboard') }}">Gestão Financeira</a>
+        <!-- Botão Toggler para telas pequenas (menu hambúrguer) -->
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
+            <span class="navbar-toggler-icon"></span> <!-- Ícone do botão toggler -->
         </button>
+        <!-- Conteúdo colapsável da Navbar -->
         <div class="collapse navbar-collapse" id="navbarNav">
+            <!-- Lista de navegação na Navbar, alinhada à direita (ml-auto) -->
             <ul class="navbar-nav ml-auto">
+                {# Bloco Jinja2: Verifica se o usuário está logado para exibir saudação ou link de login #}
                 {% if current_user.is_authenticated %}
+                    <!-- Item da Navbar exibindo saudação ao usuário logado -->
                     <li class="nav-item">
                         <span class="navbar-text">
-                            Olá, {{ current_user.username }}!
+                            Olá, {{ current_user.username }}! {# Exibe o nome de usuário #}
                         </span>
                     </li>
-                {% else %}
+                {% else %} {# Caso o usuário não esteja logado #}
+                    <!-- Item da Navbar com link para a página de login -->
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('login') }}">Entrar</a>
+                        <a class="nav-link" href="{{ url_for('login') }}">Entrar</a> {# Link para a rota/view 'login' #}
                     </li>
-                {% endif %}
+                {% endif %} {# Fim do if/else #}
             </ul>
         </div>
     </nav>
 
-    {# Container principal para o conteúdo e flash messages #}
-    <div class="container-fluid"> {# Usando container-fluid para ocupar mais espaço #}
+    {# Container fluido (ocupa toda a largura) dentro da área de conteúdo principal #}
+    <div class="container-fluid">
+        {# Bloco Jinja2 para exibir mensagens flash (mensagens temporárias do backend, ex: sucesso após salvar) #}
+        {# `get_flashed_messages(with_categories=true)` obtém as mensagens e suas categorias (ex: 'success', 'error') #}
         {% with messages = get_flashed_messages(with_categories=true) %}
+            {# Verifica se há mensagens para exibir #}
             {% if messages %}
-                <div class="messages mb-3"> {# Adiciona margem abaixo das mensagens #}
+                <!-- Container para as mensagens flash -->
+                <div class="messages mb-3"> {# Margem inferior para separar das mensagens do conteúdo #}
+                    {# Loop através de cada mensagem (categoria, texto) #}
                     {% for category, message in messages %}
-                        {# Mapeia categorias para classes de alerta Bootstrap #}
-                        {% set alert_class = 'alert-info' %} {# Padrão Info #}
-                        {% if category == 'success' %}
-                            {% set alert_class = 'alert-success' %}
-                        {% elif category == 'error' or category == 'danger' %}
-                            {% set alert_class = 'alert-danger' %}
-                        {% elif category == 'warning' %}
-                            {% set alert_class = 'alert-warning' %}
-                        {% endif %}
+                        {# Lógica Jinja2 para definir a classe CSS do alerta com base na categoria da mensagem #}
+                        {% set alert_class = 'alert-info' %} {# Classe padrão: informação (azul claro) #}
+                        {% if category == 'success' %} {# Se a categoria for 'success' #}
+                            {% set alert_class = 'alert-success' %} {# Usa a classe de sucesso (verde) #}
+                        {% elif category == 'error' or category == 'danger' %} {# Se for 'error' ou 'danger' #}
+                            {% set alert_class = 'alert-danger' %} {# Usa a classe de perigo/erro (vermelho) #}
+                        {% elif category == 'warning' %} {# Se for 'warning' #}
+                            {% set alert_class = 'alert-warning' %} {# Usa a classe de aviso (amarelo) #}
+                        {% endif %} {# Fim do if/elif #}
+                        <!-- Div do alerta Bootstrap. Classes:
+                             - alert: Estilo base do alerta
+                             - {{ alert_class }}: Cor do alerta (definida acima)
+                             - alert-dismissible: Permite fechar o alerta
+                             - fade show: Animação de fade ao aparecer/desaparecer -->
                         <div class="alert {{ alert_class }} alert-dismissible fade show" role="alert">
-                            {{ message }}
+                            {{ message }} {# Exibe o texto da mensagem flash #}
+                            <!-- Botão para fechar o alerta -->
                             <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                                <span aria-hidden="true">×</span>
+                                <span aria-hidden="true">×</span> <!-- Ícone 'x' para fechar -->
                             </button>
                         </div>
-                    {% endfor %}
+                    {% endfor %} {# Fim do loop de mensagens #}
                 </div>
-            {% endif %}
-        {% endwith %}
+            {% endif %} {# Fim do 'if messages' #}
+        {% endwith %} {# Fim do bloco 'with' #}
 
-        {% block content %}{% endblock %} {# O conteúdo da página será inserido aqui #}
+        {# Bloco Jinja2 'content'. Este é o local onde o conteúdo específico de cada página (que herda este base.html) será injetado. #}
+        {% block content %}{% endblock %}
+    </div> <!-- Fim do <div class="container-fluid"> -->
+
+</div> <!-- Fim do <div class="content"> -->
+
+<!-- Modal Genérico de Confirmação de Exclusão (Bootstrap Modal) -->
+<!-- Colocado fora do bloco 'content' para estar disponível em todas as páginas que herdam este base -->
+<div class="modal fade" id="confirmDeleteModal" tabindex="-1" role="dialog" aria-labelledby="confirmDeleteModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document"> <!-- Container do diálogo modal -->
+    <div class="modal-content"> <!-- Conteúdo do modal (fundo, borda, etc.) -->
+      <!-- Cabeçalho do modal -->
+      <div class="modal-header bg-danger text-white"> <!-- Fundo vermelho, texto branco -->
+        <h5 class="modal-title" id="confirmDeleteModalLabel">Confirmar Exclusão</h5> <!-- Título do modal -->
+        <!-- Botão 'x' para fechar o modal no cabeçalho -->
+        <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">×</span>
+        </button>
+      </div>
+      <!-- Corpo do modal -->
+      <div class="modal-body">
+        Tem certeza que deseja excluir este item? Esta ação não pode ser desfeita. <!-- Mensagem de confirmação padrão -->
+        <!-- Parágrafo opcional para exibir o nome do item sendo excluído (controlado por JS) -->
+        <p><strong id="deleteItemName" style="display: none;"></strong></p>
+      </div>
+      <!-- Rodapé do modal -->
+      <div class="modal-footer">
+        <!-- Botão para cancelar a exclusão e fechar o modal -->
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+        <!-- Formulário que será submetido para realizar a exclusão. A 'action' será definida por JS. -->
+        <form id="deleteForm" method="POST" style="display: inline;">
+             <!-- Botão que submete o formulário de exclusão -->
+             <button type="submit" class="btn btn-danger">Excluir Permanentemente</button>
+        </form>
+      </div>
     </div>
-
+  </div>
 </div>
 
+{# --- SCRIPTS GLOBAIS --- #}
+{# Incluindo bibliotecas JavaScript essenciais no final do body para melhor performance de carregamento #}
+<!-- jQuery: Biblioteca JavaScript fundamental para muitos plugins e Bootstrap JS -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<!-- jQuery Mask Plugin: Usado para formatar campos de input (ex: moeda, data) -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js"></script>
+<!-- Popper.js: Dependência do Bootstrap para posicionamento de tooltips, popovers e dropdowns -->
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
+<!-- Bootstrap JS: Funcionalidades JavaScript do Bootstrap (modals, navbar toggler, alerts dismiss) -->
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-{# Script opcional para ativar o link do menu atual (requer lógica adicional) #}
+
+{# Script para adicionar a classe 'active' ao link da sidebar correspondente à página atual #}
 <script>
-    // Adiciona a classe 'active' ao link da sidebar correspondente à URL atual
+    // Executa quando o documento estiver pronto (DOM carregado)
     $(function() {
+        // Pega o caminho da URL atual (ex: '/listar_cartoes')
         var currentPath = window.location.pathname;
+        // Itera sobre cada link (<a>) dentro do menu da sidebar
         $('.sidebar-menu a').each(function() {
-            var $this = $(this);
-            // Verifica se o href do link está contido no path atual
-            if (currentPath.indexOf($this.attr('href')) !== -1 && $this.attr('href') !== '/') {
-                 // Tratamento especial para a raiz '/' para não ativar sempre
-                 if (currentPath === '/' && $this.attr('href') === '/') {
-                     $this.addClass('active');
-                 } else if ($this.attr('href') !== '/') {
-                     $this.addClass('active');
-                     // Opcional: Se quiser apenas UM ativo, pode parar aqui ou adicionar lógica
-                 }
-            }
-            // Caso especial para ativar 'Dashboard' quando na raiz
-             if (currentPath === '/' && $this.attr('href') === '{{ url_for("index") }}') {
-                $this.addClass('active');
+            var $this = $(this); // O link atual no loop (objeto jQuery)
+            var linkHref = $this.attr('href'); // Pega o valor do atributo 'href' do link
+            // Verifica se o href do link é igual ao path atual
+            // OU se o href não é a raiz ('/') e o path atual começa com o href (para subpáginas)
+            if (linkHref === currentPath || (linkHref !== '/' && currentPath.startsWith(linkHref))) {
+                 $this.addClass('active'); // Adiciona a classe 'active' se corresponder
+            } else {
+                 $this.removeClass('active'); // Remove a classe 'active' caso contrário
             }
         });
+         // Tratamento especial para o link do Dashboard (raiz '/')
+         // Assegura que o link da raiz só fique ativo se o path for exatamente a raiz gerada por url_for
+         if (currentPath === '{{ url_for("dashboard") }}') { // <-- CORRIGIDO
+              $('.sidebar-menu a[href="{{ url_for("dashboard") }}"]').addClass('active'); // <-- CORRIGIDO
+         }
     });
 </script>
-</body>
-</html>
+
+{# Script para configurar e exibir o modal genérico de confirmação de exclusão #}
+<script>
+$(document).ready(function() {
+    // Evento disparado QUANDO o modal está prestes a ser exibido
+    $('#confirmDeleteModal').on('show.bs.modal', function (event) {
+        var button = $(event.relatedTarget); // O botão que disparou o modal (ex: o botão 'Excluir')
+        var url = button.data('url-delete'); // Pega o URL de exclusão do atributo 'data-url-delete' do botão
+        var itemName = button.data('item-name'); // Pega o nome do item do atributo 'data-item-name' (opcional)
+        var modal = $(this); // O próprio modal
+        var form = modal.find('#deleteForm'); // Encontra o formulário dentro do modal
+        form.attr('action', url); // Define o atributo 'action' do formulário com a URL de exclusão
+
+        var itemNameElement = modal.find('#deleteItemName'); // Encontra o elemento para exibir o nome do item
+        if (itemName) { // Se um nome de item foi fornecido no botão
+            itemNameElement.text('Item: ' + itemName).show(); // Define o texto e torna o elemento visível
+        } else { // Se não foi fornecido
+            itemNameElement.hide().text(''); // Esconde o elemento e limpa seu texto
+        }
+    });
+});
+</script>
+
+{# Bloco Jinja2 'scripts'. Permite que páginas filhas adicionem seus próprios scripts JavaScript específicos aqui. #}
+{% block scripts %}{% endblock %}
+
+</body> <!-- Fim do corpo do documento -->
+</html> <!-- Fim do elemento HTML -->
+{# Fim do arquivo base.html #}

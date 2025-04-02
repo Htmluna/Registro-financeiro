@@ -1,77 +1,135 @@
 {% extends 'base.html' %}
 
-{% block title %}Adicionar Conta{% endblock %}
+{% block title %}{{ title | default('Adicionar Conta') }}{% endblock %}
 
 {% block content %}
 
-    <h1>Adicionar Conta</h1>
+    <h1>{{ title | default('Adicionar Conta') }}</h1>
     <form method="POST">
         {{ form.hidden_tag() }}
+
+        {# Nome #}
         <div class="form-group">
-            {{ form.nome.label }}
-            {{ form.nome(class="form-control") }}
-            {% for error in form.nome.errors %}
-                <small class="text-danger">{{ error }}</small>
-            {% endfor %}
+            {{ form.nome.label(class="form-label") }}
+            {{ form.nome(class="form-control" + (" is-invalid" if form.nome.errors else "")) }}
+            {% if form.nome.errors %}
+                <div class="invalid-feedback">
+                    {% for error in form.nome.errors %}<span>{{ error }}</span>{% endfor %}
+                </div>
+            {% endif %}
         </div>
+
+        {# Valor #}
         <div class="form-group">
-            {{ form.valor.label }}
-            {{ form.valor(class="form-control", id="valor", type="text") }}
-            {% for error in form.valor.errors %}
-                <small class="text-danger">{{ error }}</small>
-            {% endfor %}
+            {{ form.valor.label(class="form-label") }}
+            {{ form.valor(class="form-control" + (" is-invalid" if form.valor.errors else ""), id="valor", type="text") }} {# Keep type="text" for mask #}
+             {% if form.valor.errors %}
+                <div class="invalid-feedback">
+                    {% for error in form.valor.errors %}<span>{{ error }}</span>{% endfor %}
+                </div>
+            {% endif %}
         </div>
+
+        {# Vencimento #}
         <div class="form-group">
-            {{ form.vencimento.label }}
-            {{ form.vencimento(class="form-control") }}
-            {% for error in form.vencimento.errors %}
-                <small class="text-danger">{{ error }}</small>
-            {% endfor %}
+            {{ form.vencimento.label(class="form-label") }}
+            {{ form.vencimento(class="form-control" + (" is-invalid" if form.vencimento.errors else "")) }}
+             {% if form.vencimento.errors %}
+                <div class="invalid-feedback">
+                    {% for error in form.vencimento.errors %}<span>{{ error }}</span>{% endfor %}
+                </div>
+            {% endif %}
         </div>
+
+        {# Categoria ID (Dropdown) #}
         <div class="form-group">
-            {{ form.categoria.label }}
-            {{ form.categoria(class="form-control") }}
-            {% for error in form.categoria.errors %}
-                <small class="text-danger">{{ error }}</small>
-            {% endfor %}
+            {{ form.categoria_id.label(class="form-label") }}
+            {{ form.categoria_id(class="form-control custom-select" + (" is-invalid" if form.categoria_id.errors else "")) }} {# custom-select for better styling #}
+            {% if form.categoria_id.errors %}
+                <div class="invalid-feedback">
+                    {% for error in form.categoria_id.errors %}<span>{{ error }}</span>{% endfor %}
+                </div>
+            {% endif %}
+             <small class="form-text text-muted">Não encontrou a categoria? <a href="{{ url_for('add_categoria') }}" target="_blank">Adicione uma nova</a>.</small>
         </div>
-        <div class="form-group">
-            {{ form.parcela_atual.label }}
-            {{ form.parcela_atual(class="form-control") }}
-            {% for error in form.parcela_atual.errors %}
-                <small class="text-danger">{{ error }}</small>
-            {% endfor %}
+
+        {# Parcelas #}
+        <div class="form-row">
+             <div class="form-group col-md-6">
+                {{ form.parcela_atual.label(class="form-label") }}
+                {{ form.parcela_atual(class="form-control" + (" is-invalid" if form.parcela_atual.errors else "")) }}
+                 {% if form.parcela_atual.errors %}
+                    <div class="invalid-feedback">
+                        {% for error in form.parcela_atual.errors %}<span>{{ error }}</span>{% endfor %}
+                    </div>
+                {% endif %}
+            </div>
+             <div class="form-group col-md-6">
+                {{ form.total_parcelas.label(class="form-label") }}
+                {{ form.total_parcelas(class="form-control" + (" is-invalid" if form.total_parcelas.errors else "")) }}
+                 {% if form.total_parcelas.errors %}
+                    <div class="invalid-feedback">
+                        {% for error in form.total_parcelas.errors %}<span>{{ error }}</span>{% endfor %}
+                    </div>
+                {% endif %}
+            </div>
         </div>
-        <div class="form-group">
-            {{ form.total_parcelas.label }}
-            {{ form.total_parcelas(class="form-control") }}
-            {% for error in form.total_parcelas.errors %}
-                <small class="text-danger">{{ error }}</small>
-            {% endfor %}
-        </div>
-        <div class="form-group form-check">
-            {{ form.recorrente(class="form-check-input") }}
+         {% if form.total_parcelas.errors %} {# Show general form errors related to parcelas if any #}
+             {% for error in form.total_parcelas.errors %}
+                 {% if error == 'Parcela atual não pode ser maior que o total de parcelas.' %}
+                    <div class="alert alert-danger alert-sm">{{ error }}</div>
+                 {% endif %}
+             {% endfor %}
+         {% endif %}
+
+
+        {# Recorrente (Checkbox) #}
+        <div class="form-group form-check mb-3">
+            {{ form.recorrente(class="form-check-input" + (" is-invalid" if form.recorrente.errors else "")) }}
             {{ form.recorrente.label(class="form-check-label") }}
-            {% for error in form.recorrente.errors %}
-                <small class="text-danger">{{ error }}</small>
-            {% endfor %}
+            {% if form.recorrente.errors %}
+                <div class="invalid-feedback">
+                    {% for error in form.recorrente.errors %}<span>{{ error }}</span>{% endfor %}
+                </div>
+            {% endif %}
         </div>
+
+        {# Tipo de Pagamento (Dropdown) #}
         <div class="form-group">
-            {{ form.tipo_pagamento.label }}
-            {{ form.tipo_pagamento(class="form-control") }}
-            {% for error in form.tipo_pagamento.errors %}
-                <small class="text-danger">{{ error }}</small>
-            {% endfor %}
+            {{ form.tipo_pagamento.label(class="form-label") }}
+            {{ form.tipo_pagamento(class="form-control custom-select" + (" is-invalid" if form.tipo_pagamento.errors else "")) }}
+            {% if form.tipo_pagamento.errors %}
+                 <div class="invalid-feedback">
+                    {% for error in form.tipo_pagamento.errors %}<span>{{ error }}</span>{% endfor %}
+                </div>
+            {% endif %}
+             <small class="form-text text-muted">Selecione como esta conta impacta seu saldo/limite (opcional).</small>
         </div>
+
         {{ form.submit(class="btn btn-primary") }}
-        <a href="{{ url_for('index') }}" class="btn btn-secondary">Cancelar</a>
+        <a href="{{ url_for('dashboard') }}" class="btn btn-secondary">Cancelar</a>
     </form>
 {% endblock %}
 
 {% block scripts %}
+    {{ super() }} {# Include scripts from base.html if any #}
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js"></script>
     <script>
       $(document).ready(function() {
         $('#valor').mask('000.000.000.000.000,00', { reverse: true });
+
+        // Optional: Show/hide parcela fields based on recurring?
+        // function toggleParcelas() {
+        //     if ($('#recorrente').is(':checked')) {
+        //         $('#parcela_atual').closest('.form-group').hide();
+        //         $('#total_parcelas').closest('.form-group').hide();
+        //     } else {
+        //          $('#parcela_atual').closest('.form-group').show();
+        //         $('#total_parcelas').closest('.form-group').show();
+        //     }
+        // }
+        // $('#recorrente').change(toggleParcelas);
+        // toggleParcelas(); // Run on page load
       });
     </script>
 {% endblock %}

@@ -1,45 +1,77 @@
+{# Indica que este template herda a estrutura do template 'base.html'. #}
 {% extends 'base.html' %}
 
+{# Define o título específico para esta página (Contas Bancárias). #}
 {% block title %}Contas Bancárias{% endblock %}
 
+{# Início do bloco principal de conteúdo ('content'). #}
 {% block content %}
 
+    {# Título principal da página. #}
     <h1>Contas Bancárias</h1>
 
-
+    {# Link (estilizado como botão primário) para a página de adicionar nova conta bancária.
+       `url_for('add_conta_bancaria')` gera o URL para a rota correspondente.
+       `mb-3` adiciona margem inferior. #}
     <a href="{{ url_for('add_conta_bancaria') }}" class="btn btn-primary mb-3">Adicionar Conta Bancária</a>
 
+    {# Container para tornar a tabela responsiva em telas menores (adiciona scroll horizontal se necessário). #}
     <div class="table-responsive">
+        {# Tabela HTML com estilos Bootstrap: linhas listradas (`table-striped`) e efeito hover (`table-hover`). #}
         <table class="table table-striped table-hover">
+            {# Cabeçalho da tabela. #}
             <thead>
+            {# Linha do cabeçalho. #}
             <tr>
-                <th>Nome</th>
-                <th>Saldo</th>
-                <th>Ações</th>
+                <th>Nome</th>   {# Coluna para o nome da conta bancária. #}
+                <th>Saldo</th>  {# Coluna para o saldo da conta bancária. #}
+                <th>Ações</th>  {# Coluna para os botões de ação (Editar, Excluir). #}
             </tr>
             </thead>
+            {# Corpo da tabela, onde os dados das contas bancárias serão listados. #}
             <tbody>
+            {# Loop Jinja: Itera sobre cada objeto 'conta' na lista 'contas_bancarias' (passada pelo backend). #}
             {% for conta in contas_bancarias %}
+                {# Linha da tabela representando uma conta bancária. #}
                 <tr>
+                    {# Célula exibindo o nome da conta. #}
                     <td>{{ conta.nome }}</td>
+                    {# Célula exibindo o saldo formatado como moeda brasileira (assume a existência da função/filtro `formatar_br`). #}
                     <td>{{ formatar_br(conta.saldo) }}</td>
+                    {# Célula contendo os botões de ação para esta conta específica. #}
                     <td>
+                        {# Botão Editar: Link (`<a>`) estilizado como botão pequeno de contorno primário (azul).
+                           `url_for('edit_conta_bancaria', id=conta.id)` gera o URL para a rota de edição, passando o ID da conta. #}
                         <a href="{{ url_for('edit_conta_bancaria', id=conta.id) }}"
                            class="btn btn-sm btn-outline-primary">Editar</a>
+                        {# Botão Excluir: Implementado como um formulário POST inline para segurança (evita exclusão via GET).
+                           `action="{{ url_for('delete_conta_bancaria', id=conta.id) }}"` define a URL de destino para a exclusão.
+                           `method="post"` especifica o método HTTP.
+                           `style="display: inline;"` mantém o botão na mesma linha do botão Editar. #}
                         <form action="{{ url_for('delete_conta_bancaria', id=conta.id) }}" method="post"
                               style="display: inline;">
+                            {# Botão que submete o formulário de exclusão.
+                               `type="submit"`: Define como botão de submissão.
+                               `class="btn btn-sm btn-outline-danger"`: Estilo Bootstrap (pequeno, contorno vermelho).
+                               `onclick="return confirm(...)"`: Adiciona uma confirmação JavaScript antes de enviar.
+                                 - Se o usuário clicar "OK" no pop-up, `confirm` retorna `true` e o formulário é enviado.
+                                 - Se clicar "Cancelar", retorna `false` e a submissão é cancelada. #}
                             <button type="submit" class="btn btn-sm btn-outline-danger"
                                     onclick="return confirm('Tem certeza que deseja excluir esta conta bancária?');">Excluir
                             </button>
-                        </form>
+                        </form> {# Fim do formulário de exclusão. #}
                     </td>
                 </tr>
+            {# Bloco `else` do loop `for`: Executado se a lista 'contas_bancarias' estiver vazia. #}
             {% else %}
+                {# Linha da tabela indicando que nenhuma conta foi encontrada.
+                   `colspan="3"` faz esta célula ocupar a largura das 3 colunas do cabeçalho. #}
                 <tr>
                     <td colspan="3">Nenhuma conta bancária cadastrada.</td>
                 </tr>
-            {% endfor %}
-            </tbody>
-        </table>
-    </div>
+            {% endfor %} {# Fim do loop `for conta in contas_bancarias`. #}
+            </tbody> {# Fim do corpo da tabela. #}
+        </table> {# Fim da tabela. #}
+    </div> {# Fim do container responsivo. #}
+{# Fim do bloco 'content'. #}
 {% endblock %}

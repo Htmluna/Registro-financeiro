@@ -1,57 +1,98 @@
+{# Indica que este template herda a estrutura e blocos do template 'base.html'. #}
 {% extends 'base.html' %}
 
+{# Define o título específico para esta página (Registro). #}
 {% block title %}Registro{% endblock %}
 
+{# Início do bloco principal de conteúdo ('content'). #}
 {% block content %}
-<div class="row justify-content-center mt-5"> {# Row para centralizar a coluna #}
-    <div class="col-md-7 col-lg-6"> {# Coluna um pouco maior para registro #}
-        <div class="card shadow-sm"> {# Adiciona card com sombra sutil #}
-            <div class="card-body p-4"> {# Adiciona padding dentro do card #}
-                <h2 class="card-title text-center mb-4">Criar Conta</h2> {# Título centralizado #}
-                <form method="post" novalidate> {# novalidate desativa validação HTML padrão #}
+{# Linha Bootstrap para conter a coluna e centralizá-la horizontalmente (`justify-content-center`).
+   `mt-5` adiciona uma margem significativa no topo. #}
+<div class="row justify-content-center mt-5">
+    {# Coluna Bootstrap. Ocupa 7 de 12 colunas em telas médias (`md`) ou maiores,
+       e 6 de 12 colunas em telas grandes (`lg`) ou maiores. Ligeiramente maior que o login para acomodar mais campos. #}
+    <div class="col-md-7 col-lg-6">
+        {# Card Bootstrap: container com borda e fundo. `shadow-sm` adiciona uma sombra sutil. #}
+        <div class="card shadow-sm">
+            {# Corpo do card. `p-4` adiciona padding interno. #}
+            <div class="card-body p-4">
+                {# Título do card, centralizado (`text-center`) e com margem inferior (`mb-4`). #}
+                <h2 class="card-title text-center mb-4">Criar Conta</h2>
+                {# Início do formulário de registro. `method="post"` envia dados de forma segura.
+                   `novalidate` desativa validação HTML padrão, confiando na validação do backend (Flask/WTForms). #}
+                <form method="post" novalidate>
+                    {# Renderiza campos ocultos, como o token CSRF para segurança. #}
                     {{ form.hidden_tag() }}
+
+                    {# Agrupamento para o campo 'username'. `mb-3` adiciona margem inferior. #}
                     <div class="form-group mb-3">
+                        {# Renderiza a tag <label> para o username com classe Bootstrap 'form-label'. #}
                         {{ form.username.label(class="form-label") }}
-                        {{ form.username(class='form-control form-control-lg') }} {# Input maior #}
+                        {# Renderiza o campo <input> para username.
+                           `class='form-control form-control-lg'` aplica estilo Bootstrap padrão e torna o campo maior. #}
+                        {{ form.username(class='form-control form-control-lg') }}
+                         {# Bloco condicional para exibir erros de validação do username. #}
                          {% if form.username.errors %}
-                            <div class="invalid-feedback d-block"> {# Mostra erro abaixo #}
+                            {# Container para erros com estilo Bootstrap 'invalid-feedback'.
+                               `d-block` força a exibição, pois não estamos usando a classe 'is-invalid' no input aqui. #}
+                            <div class="invalid-feedback d-block">
+                                {# Loop para exibir cada erro encontrado para o campo username. #}
                                 {% for error in form.username.errors %}
-                                    <span>{{ error }}</span>
+                                    <span>{{ error }}</span> {# Exibe o texto do erro. #}
                                 {% endfor %}
                             </div>
-                        {% endif %}
+                        {% endif %} {# Fim do bloco de erros para username. #}
                     </div>
+
+                    {# Agrupamento para o campo 'password'. `mb-3` adiciona margem inferior. #}
                     <div class="form-group mb-3">
+                        {# Renderiza a tag <label> para password. #}
                         {{ form.password.label(class="form-label") }}
-                        {{ form.password(class='form-control form-control-lg') }} {# Input maior #}
+                        {# Renderiza o campo <input type="password"> para password, com estilo grande. #}
+                        {{ form.password(class='form-control form-control-lg') }}
+                         {# Bloco condicional para exibir erros de validação do password. #}
                          {% if form.password.errors %}
                             <div class="invalid-feedback d-block">
                                 {% for error in form.password.errors %}
                                     <span>{{ error }}</span>
                                 {% endfor %}
                             </div>
-                        {% endif %}
+                        {% endif %} {# Fim do bloco de erros para password. #}
                     </div>
+
+                    {# Agrupamento para o campo 'confirm_password'. `mb-4` adiciona margem inferior maior antes do botão. #}
                     <div class="form-group mb-4">
+                        {# Renderiza a tag <label> para confirmar a senha. #}
                         {{ form.confirm_password.label(class="form-label") }}
-                        {{ form.confirm_password(class='form-control form-control-lg') }} {# Input maior #}
+                        {# Renderiza o campo <input type="password"> para confirmar a senha, com estilo grande. #}
+                        {{ form.confirm_password(class='form-control form-control-lg') }}
+                         {# Bloco condicional para exibir erros de validação da confirmação de senha (ex: senhas não conferem). #}
                          {% if form.confirm_password.errors %}
                             <div class="invalid-feedback d-block">
                                 {% for error in form.confirm_password.errors %}
                                     <span>{{ error }}</span>
                                 {% endfor %}
                             </div>
-                        {% endif %}
+                        {% endif %} {# Fim do bloco de erros para confirm_password. #}
                     </div>
-                    <div class="d-grid gap-2 mb-3"> {# Usa d-grid para botão de bloco moderno #}
-                        {{ form.submit(class='btn btn-primary btn-lg') }} {# Botão maior #}
+
+                    {# Container Bootstrap para o botão de submit usando display grid (`d-grid`) para botão de largura total.
+                       `mb-3` adiciona margem inferior. #}
+                    <div class="d-grid gap-2 mb-3">
+                        {# Renderiza o botão <button type="submit"> para submeter o formulário.
+                           `class='btn btn-primary btn-lg'` aplica estilo Bootstrap de botão primário (azul) e grande. #}
+                        {{ form.submit(class='btn btn-primary btn-lg') }}
                     </div>
+
+                    {# Parágrafo centralizado (`text-center`) com margem no topo (`mt-3`). #}
                     <p class="text-center mt-3">
-                        Já tem uma conta? <a href="{{ url_for('login') }}">Faça login</a>.
+                        Já tem uma conta? {# Texto informativo. #}
+                        {# Link para a página de login. `url_for('login')` gera o URL dinamicamente. #}
+                        <a href="{{ url_for('login') }}">Faça login</a>.
                     </p>
-                </form>
-            </div>
-        </div>
-    </div>
-</div>
-{% endblock %}
+                </form> {# Fim do formulário. #}
+            </div> {# Fim do card-body. #}
+        </div> {# Fim do card. #}
+    </div> {# Fim da coluna. #}
+</div> {# Fim da linha. #}
+{% endblock %} {# Fim do bloco 'content'. #}

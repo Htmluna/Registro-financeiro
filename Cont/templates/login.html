@@ -1,50 +1,93 @@
+{# Indica que este template herda a estrutura do template 'base.html'. #}
 {% extends 'base.html' %}
 
+{# Define o título específico para esta página. #}
 {% block title %}Login{% endblock %}
 
+{# Início do bloco principal de conteúdo ('content'). #}
 {% block content %}
-<div class="row justify-content-center mt-5"> {# Row para centralizar a coluna #}
-    <div class="col-md-6 col-lg-5"> {# Define a largura da coluna (menor em telas grandes) #}
-        <div class="card shadow-sm"> {# Adiciona card com sombra sutil #}
-            <div class="card-body p-4"> {# Adiciona padding dentro do card #}
-                <h2 class="card-title text-center mb-4">Login</h2> {# Título centralizado #}
-                <form method="POST" novalidate> {# novalidate desativa validação HTML padrão #}
+{# Linha Bootstrap para conter a coluna e centralizá-la horizontalmente (`justify-content-center`).
+   `mt-5` adiciona uma margem significativa no topo. #}
+<div class="row justify-content-center mt-5">
+    {# Coluna Bootstrap. Ocupa 6 de 12 colunas em telas médias (`md`) ou maiores,
+       e 5 de 12 colunas em telas grandes (`lg`) ou maiores, tornando o formulário mais estreito em telas grandes. #}
+    <div class="col-md-6 col-lg-5">
+        {# Card Bootstrap: um container com borda e fundo padrão. `shadow-sm` adiciona uma sombra pequena e sutil. #}
+        <div class="card shadow-sm">
+            {# Corpo do card. `p-4` adiciona um padding interno generoso. #}
+            <div class="card-body p-4">
+                {# Título do card (`card-title`), centralizado (`text-center`) e com margem inferior (`mb-4`). #}
+                <h2 class="card-title text-center mb-4">Login</h2>
+                {# Início do formulário. `method="POST"` envia os dados de forma segura (não na URL).
+                   `novalidate` desativa a validação de formulário padrão do navegador,
+                   pois a validação será feita pelo backend (WTForms/Flask) e exibida explicitamente. #}
+                <form method="POST" novalidate>
+                    {# Renderiza campos ocultos do formulário, CRUCIALMENTE o token CSRF para proteção contra ataques Cross-Site Request Forgery. #}
                     {{ form.hidden_tag() }}
-                    <div class="form-group mb-3"> {# Aumenta margem inferior #}
-                        {{ form.username.label(class="form-label") }} {# Usa classe form-label #}
-                        {{ form.username(class="form-control form-control-lg") }} {# Input maior #}
+
+                    {# Agrupamento para o campo 'username'. `mb-3` adiciona margem inferior. #}
+                    <div class="form-group mb-3">
+                        {# Renderiza a tag <label> para o campo username. `class="form-label"` aplica estilo Bootstrap. #}
+                        {{ form.username.label(class="form-label") }}
+                        {# Renderiza o campo <input> para username.
+                           `class="form-control"` aplica estilo Bootstrap padrão.
+                           `form-control-lg` torna o campo de input maior (altura e fonte). #}
+                        {{ form.username(class="form-control form-control-lg") }}
+                        {# Bloco condicional: Exibe erros apenas se existirem para este campo após a submissão. #}
                         {% if form.username.errors %}
-                            <div class="invalid-feedback d-block"> {# Mostra erro abaixo #}
+                            {# Container para mensagens de erro. `invalid-feedback` é a classe Bootstrap padrão para erros (geralmente texto vermelho).
+                               `d-block` força a exibição do erro, já que não estamos usando a classe `is-invalid` no input aqui. #}
+                            <div class="invalid-feedback d-block">
+                                {# Loop para exibir cada erro associado ao campo username (pode haver mais de um). #}
                                 {% for error in form.username.errors %}
-                                    <span>{{ error }}</span>
+                                    <span>{{ error }}</span> {# Exibe o texto do erro. #}
                                 {% endfor %}
                             </div>
-                        {% endif %}
+                        {% endif %} {# Fim do bloco de erros para username. #}
                     </div>
-                    <div class="form-group mb-4"> {# Aumenta margem inferior #}
+
+                    {# Agrupamento para o campo 'password'. `mb-4` adiciona margem inferior um pouco maior. #}
+                    <div class="form-group mb-4">
+                        {# Renderiza a tag <label> para password. #}
                         {{ form.password.label(class="form-label") }}
-                        {{ form.password(class="form-control form-control-lg") }} {# Input maior #}
+                        {# Renderiza o campo <input type="password"> para password.
+                           Estilo `form-control form-control-lg` (campo maior). #}
+                        {{ form.password(class="form-control form-control-lg") }}
+                         {# Bloco condicional para exibir erros do campo password. #}
                          {% if form.password.errors %}
                             <div class="invalid-feedback d-block">
                                 {% for error in form.password.errors %}
                                     <span>{{ error }}</span>
                                 {% endfor %}
                             </div>
-                        {% endif %}
+                        {% endif %} {# Fim do bloco de erros para password. #}
                     </div>
-                    <div class="d-grid gap-2 mb-3"> {# Usa d-grid para botão de bloco moderno #}
-                         {{ form.submit(class="btn btn-primary btn-lg") }} {# Botão maior #}
+
+                    {# Container Bootstrap para o botão de submit.
+                       `d-grid` (Bootstrap 5+) transforma o container num grid, fazendo o botão dentro dele ocupar toda a largura disponível.
+                       `gap-2` adicionaria espaço se houvesse mais de um item no grid.
+                       `mb-3` adiciona margem inferior. #}
+                    <div class="d-grid gap-2 mb-3">
+                         {# Renderiza o botão <button type="submit">.
+                            `class="btn btn-primary"` aplica o estilo de botão primário (azul) do Bootstrap.
+                            `btn-lg` torna o botão maior. #}
+                         {{ form.submit(class="btn btn-primary btn-lg") }}
                     </div>
+
+                    {# Parágrafo centralizado (`text-center`) com margem no topo (`mt-3`). #}
                     <p class="text-center mt-3">
-                        Não tem uma conta? <a href="{{ url_for('register') }}">Registre-se</a>.
+                        Não tem uma conta? {# Texto informativo. #}
+                        {# Link para a página de registro. `url_for('register')` gera o URL dinamicamente. #}
+                        <a href="{{ url_for('register') }}">Registre-se</a>.
                     </p>
-                     {# Link opcional para reset de senha #}
+                     {# Parágrafo opcional para o link de recuperação de senha. Centralizado (`text-center`) com margem no topo (`mt-2`). #}
                     <p class="text-center mt-2">
+                        {# Link para a página de reset de senha. `url_for('reset_password')` gera o URL. #}
                         <a href="{{ url_for('reset_password') }}">Esqueceu a senha?</a>
                     </p>
-                </form>
-            </div>
-        </div>
-    </div>
-</div>
-{% endblock %}
+                </form> {# Fim do formulário. #}
+            </div> {# Fim do card-body. #}
+        </div> {# Fim do card. #}
+    </div> {# Fim da coluna. #}
+</div> {# Fim da linha. #}
+{% endblock %} {# Fim do bloco 'content'. #}
