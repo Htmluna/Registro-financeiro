@@ -113,13 +113,10 @@
             <tbody>
                 {# Loop Jinja: Itera sobre cada objeto 'conta' na lista 'contas_mes' (passada pelo backend). #}
                 {% for conta in contas_mes %}
-                    {# Define a variável 'hoje' dentro do loop usando o módulo datetime importado no final do arquivo.
-                       Necessário para comparar com a data de vencimento. #}
-                    {% set hoje = modules.datetime.date.today() %}
-                    {# Linha da tabela para uma conta.
+                   {# Linha da tabela para uma conta.
                        - Adiciona a classe 'table-warning' (fundo amarelo) se a conta tiver vencimento E este for anterior à data de hoje ('hoje').
                          Isso destaca contas potencialmente vencidas (relativo ao dia que o relatório é visto). #}
-                    <tr class="{{ 'table-warning' if conta.vencimento and conta.vencimento < hoje else '' }}">
+                    <tr class="{{ 'table-warning' if conta.vencimento and hoje and conta.vencimento < hoje else '' }}">
                         <td>{{ conta.nome }}</td> {# Nome da conta. #}
                         {# Valor formatado, alinhado à direita (`text-right`). #}
                         <td class="text-right">{{ formatar_br(conta.valor) }}</td>
@@ -132,15 +129,15 @@
                         {# Nome do tipo de pagamento, obtido via função helper `get_tipo_pagamento_nome` (passada pelo backend ou definida globalmente). #}
                         <td>{{ get_tipo_pagamento_nome(conta.tipo_pagamento_id) }}</td>
                     </tr>
-                {# Bloco `else` do loop `for`: Exibido se a lista 'contas_mes' estiver vazia. #}
-                {% else %}
-                    {# Linha única indicando que nenhuma conta foi encontrada para os filtros/período.
-                       - `colspan="6"`: Faz a célula ocupar todas as 6 colunas.
-                       - Estilos de texto centralizado, itálico, cinza e com padding vertical. #}
+                {% endfor %}
+
+                {# Linha única indicando que nenhuma conta foi encontrada para os filtros/período.
+                    Será exibida APENAS se a lista 'contas_mes' estiver vazia. #}
+                {% if not contas_mes %}
                     <tr>
                         <td colspan="6" class="text-center font-italic text-muted py-4">Nenhuma conta encontrada para este período e filtros.</td>
                     </tr>
-                {% endif %} {# Fim do if/else para contas_mes. #}
+                {% endif %}
 
                  {# --- Linha de Rodapé com Total --- #}
                  {# Exibe esta linha apenas se houver contas na lista 'contas_mes'. #}
@@ -219,8 +216,3 @@
 
 {# Fim do bloco 'content'. #}
 {% endblock %}
-
-{# Importa o módulo 'datetime' do Python para poder usá-lo dentro do template.
-   É nomeado como 'modules' para evitar conflito com variáveis chamadas 'datetime'.
-   Usado para obter a data atual (`modules.datetime.date.today()`) para comparação com o vencimento. #}
-{% import 'datetime' as modules %}

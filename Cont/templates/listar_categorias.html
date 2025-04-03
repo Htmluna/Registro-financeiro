@@ -62,7 +62,7 @@
                     <button type="button" class="btn btn-sm btn-outline-danger" title="Excluir"
                             data-toggle="modal"
                             data-target="#confirmDeleteModal"
-                            data-url-delete="{{ url_for('delete_categoria', id=categoria.id) }}"
+                            data-url-delete="{{ url_for('delete_categoria_route', id=categoria.id) }}"
                             data-item-name="{{ categoria.nome }}">
                         {# Ícone Font Awesome de lixeira. #}
                         <i class="fas fa-trash-alt"></i>

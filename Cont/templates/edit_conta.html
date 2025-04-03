@@ -38,7 +38,18 @@
                 </div>
             {% endif %} {# Fim do bloco de erros para 'nome'. #}
         </div>
-
+         {# Valor Total da Compra #}
+        <div class="form-group">
+            {{ form.valor_total_compra.label(class="form-control-label") }}
+            {{ form.valor_total_compra(class="form-control"+ (" is-invalid" if form.valor_total_compra.errors else ""), id="valor_total_compra", type="text") }}
+            {% if form.valor_total_compra.errors %}
+                <ul class="invalid-feedback">
+                    {% for error in form.valor_total_compra.errors %}
+                        <li>{{ error }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        </div>
         {# --- Campo Valor --- #}
         <div class="form-group">
             {# Renderiza a tag <label> para o campo 'valor'. #}
@@ -198,6 +209,7 @@
       $(document).ready(function() {
         // Seleciona o campo com id 'valor' e aplica a máscara de moeda brasileira.
         $('#valor').mask('000.000.000.000.000,00', { reverse: true });
+          $('#valor_total_compra').mask('000.000.000.000.000,00', { reverse: true });
         // Opcional: $('#valor').trigger('input'); // Para forçar a máscara no valor inicial se necessário.
       });
     </script>

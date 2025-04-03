@@ -251,22 +251,69 @@
         </div>
         <!-- Lista (menu) de navegação da sidebar -->
         <ul class="sidebar-menu">
-            {# Item do menu: Link para o Dashboard. `url_for('index')` gera o URL para a rota/view 'index'. #}
-                <li><a href="{{ url_for('dashboard') }}"><i class="fas fa-tachometer-alt"></i>Dashboard</a></li>
+            {# Item do menu: Link para o Dashboard. #}
+            <li>
+                <a href="{{ url_for('dashboard') }}">
+                    <i class="fas fa-tachometer-alt"></i>
+                    <span>Dashboard</span>
+                </a>
+            </li>
+            {# Item do menu: Link para a página de detalhes financeiros. #}
+            <li>
+                <a href="{{ url_for('detalhes_financeiros') }}">
+                    <i class="fas fa-file-invoice-dollar"></i>  {# Ícone adicionado #}
+                    <span>Detalhes Financeiros</span>
+                </a>
+            </li>
             {# Item do menu: Link para adicionar conta. #}
-                <li><a href="{{ url_for('add_conta') }}"><i class="fas fa-plus-circle"></i>Adicionar Conta</a></li>
+            <li>
+                <a href="{{ url_for('add_conta') }}">
+                    <i class="fas fa-plus-circle"></i>
+                    <span>Adicionar Conta</span>
+                </a>
+            </li>
             {# Item do menu: Link para listar categorias. #}
-                <li><a href="{{ url_for('listar_categorias') }}"><i class="fas fa-tags"></i>Categorias</a></li>
+            <li>
+                <a href="{{ url_for('listar_categorias') }}">
+                    <i class="fas fa-tags"></i>
+                    <span>Categorias</span>
+                </a>
+            </li>
             {# Item do menu: Link para listar cartões de crédito. #}
-                <li><a href="{{ url_for('listar_cartoes') }}"><i class="fas fa-credit-card"></i>Cartões</a></li>
+            <li>
+                <a href="{{ url_for('listar_cartoes') }}">
+                    <i class="fas fa-credit-card"></i>
+                    <span>Cartões</span>
+                </a>
+            </li>
             {# Item do menu: Link para listar contas bancárias. #}
-                <li><a href="{{ url_for('listar_contas_bancarias') }}"><i class="fas fa-landmark"></i>Contas Bancárias</a></li>
+            <li>
+                <a href="{{ url_for('listar_contas_bancarias') }}">
+                    <i class="fas fa-landmark"></i>
+                    <span>Contas Bancárias</span>
+                </a>
+            </li>
             {# Item do menu: Link para a página de seleção de relatório mensal. #}
-                <li><a href="{{ url_for('selecionar_relatorio') }}"><i class="fas fa-chart-bar"></i>Relatório Mensal</a></li>
+            <li>
+                <a href="{{ url_for('selecionar_relatorio') }}">
+                    <i class="fas fa-chart-bar"></i>
+                    <span>Relatório Mensal</span>
+                </a>
+            </li>
             {# Item do menu: Link para a página de alteração de senha. #}
-                <li><a href="{{ url_for('reset_password') }}"><i class="fas fa-key"></i>Alterar Senha</a></li>
-            {# Item do menu: Link para fazer logout. `url_for('logout')` gera o URL para a rota/view de logout. #}
-                <li><a href="{{ url_for('logout') }}"><i class="fas fa-sign-out-alt"></i>Sair</a></li>
+            <li>
+                <a href="{{ url_for('reset_password') }}">
+                    <i class="fas fa-key"></i>
+                    <span>Alterar Senha</span>
+                </a>
+            </li>
+            {# Item do menu: Link para fazer logout. #}
+            <li>
+                <a href="{{ url_for('logout') }}">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Sair</span>
+                </a>
+            </li>
         </ul>
         <!-- Opcional: Adicionar um sidebar-footer aqui se necessário -->
     </div>

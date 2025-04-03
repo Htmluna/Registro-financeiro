@@ -19,13 +19,24 @@
             {% endif %}
         </div>
 
-        {# Valor #}
+        {# Valor (Parcela) #}
         <div class="form-group">
             {{ form.valor.label(class="form-label") }}
-            {{ form.valor(class="form-control" + (" is-invalid" if form.valor.errors else ""), id="valor", type="text") }} {# Keep type="text" for mask #}
-             {% if form.valor.errors %}
+            {{ form.valor(class="form-control" + (" is-invalid" if form.valor.errors else ""), id="valor", type="text") }}
+            {% if form.valor.errors %}
                 <div class="invalid-feedback">
                     {% for error in form.valor.errors %}<span>{{ error }}</span>{% endfor %}
+                </div>
+            {% endif %}
+        </div>
+
+        {# Valor Total da Compra #}
+        <div class="form-group">
+            {{ form.valor_total_compra.label(class="form-label") }}
+            {{ form.valor_total_compra(class="form-control" + (" is-invalid" if form.valor_total_compra.errors else ""), id="valor_total_compra", type="text") }}
+            {% if form.valor_total_compra.errors %}
+                <div class="invalid-feedback">
+                    {% for error in form.valor_total_compra.errors %}<span>{{ error }}</span>{% endfor %}
                 </div>
             {% endif %}
         </div>
@@ -34,7 +45,7 @@
         <div class="form-group">
             {{ form.vencimento.label(class="form-label") }}
             {{ form.vencimento(class="form-control" + (" is-invalid" if form.vencimento.errors else "")) }}
-             {% if form.vencimento.errors %}
+            {% if form.vencimento.errors %}
                 <div class="invalid-feedback">
                     {% for error in form.vencimento.errors %}<span>{{ error }}</span>{% endfor %}
                 </div>
@@ -44,44 +55,45 @@
         {# Categoria ID (Dropdown) #}
         <div class="form-group">
             {{ form.categoria_id.label(class="form-label") }}
-            {{ form.categoria_id(class="form-control custom-select" + (" is-invalid" if form.categoria_id.errors else "")) }} {# custom-select for better styling #}
+            {{ form.categoria_id(class="form-control custom-select" + (" is-invalid" if form.categoria_id.errors else "")) }}
             {% if form.categoria_id.errors %}
                 <div class="invalid-feedback">
                     {% for error in form.categoria_id.errors %}<span>{{ error }}</span>{% endfor %}
                 </div>
             {% endif %}
-             <small class="form-text text-muted">Não encontrou a categoria? <a href="{{ url_for('add_categoria') }}" target="_blank">Adicione uma nova</a>.</small>
+            <small class="form-text text-muted">Não encontrou a categoria? <a href="{{ url_for('add_categoria') }}"
+                                                                                target="_blank">Adicione uma
+                nova</a>.</small>
         </div>
 
         {# Parcelas #}
         <div class="form-row">
-             <div class="form-group col-md-6">
+            <div class="form-group col-md-6">
                 {{ form.parcela_atual.label(class="form-label") }}
                 {{ form.parcela_atual(class="form-control" + (" is-invalid" if form.parcela_atual.errors else "")) }}
-                 {% if form.parcela_atual.errors %}
+                {% if form.parcela_atual.errors %}
                     <div class="invalid-feedback">
                         {% for error in form.parcela_atual.errors %}<span>{{ error }}</span>{% endfor %}
                     </div>
                 {% endif %}
             </div>
-             <div class="form-group col-md-6">
+            <div class="form-group col-md-6">
                 {{ form.total_parcelas.label(class="form-label") }}
                 {{ form.total_parcelas(class="form-control" + (" is-invalid" if form.total_parcelas.errors else "")) }}
-                 {% if form.total_parcelas.errors %}
+                {% if form.total_parcelas.errors %}
                     <div class="invalid-feedback">
                         {% for error in form.total_parcelas.errors %}<span>{{ error }}</span>{% endfor %}
                     </div>
                 {% endif %}
             </div>
         </div>
-         {% if form.total_parcelas.errors %} {# Show general form errors related to parcelas if any #}
-             {% for error in form.total_parcelas.errors %}
-                 {% if error == 'Parcela atual não pode ser maior que o total de parcelas.' %}
+        {% if form.total_parcelas.errors %}
+            {% for error in form.total_parcelas.errors %}
+                {% if error == 'Parcela atual não pode ser maior que o total de parcelas.' %}
                     <div class="alert alert-danger alert-sm">{{ error }}</div>
-                 {% endif %}
-             {% endfor %}
-         {% endif %}
-
+                {% endif %}
+            {% endfor %}
+        {% endif %}
 
         {# Recorrente (Checkbox) #}
         <div class="form-group form-check mb-3">
@@ -99,37 +111,26 @@
             {{ form.tipo_pagamento.label(class="form-label") }}
             {{ form.tipo_pagamento(class="form-control custom-select" + (" is-invalid" if form.tipo_pagamento.errors else "")) }}
             {% if form.tipo_pagamento.errors %}
-                 <div class="invalid-feedback">
+                <div class="invalid-feedback">
                     {% for error in form.tipo_pagamento.errors %}<span>{{ error }}</span>{% endfor %}
                 </div>
             {% endif %}
-             <small class="form-text text-muted">Selecione como esta conta impacta seu saldo/limite (opcional).</small>
+            <small class="form-text text-muted">Selecione como esta conta impacta seu saldo/limite (opcional).</small>
         </div>
 
         {{ form.submit(class="btn btn-primary") }}
         <a href="{{ url_for('dashboard') }}" class="btn btn-secondary">Cancelar</a>
     </form>
+
 {% endblock %}
 
 {% block scripts %}
-    {{ super() }} {# Include scripts from base.html if any #}
+    {{ super() }}
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js"></script>
     <script>
       $(document).ready(function() {
         $('#valor').mask('000.000.000.000.000,00', { reverse: true });
-
-        // Optional: Show/hide parcela fields based on recurring?
-        // function toggleParcelas() {
-        //     if ($('#recorrente').is(':checked')) {
-        //         $('#parcela_atual').closest('.form-group').hide();
-        //         $('#total_parcelas').closest('.form-group').hide();
-        //     } else {
-        //          $('#parcela_atual').closest('.form-group').show();
-        //         $('#total_parcelas').closest('.form-group').show();
-        //     }
-        // }
-        // $('#recorrente').change(toggleParcelas);
-        // toggleParcelas(); // Run on page load
+        $('#valor_total_compra').mask('000.000.000.000.000,00', { reverse: true });
       });
     </script>
 {% endblock %}

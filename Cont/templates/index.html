@@ -18,10 +18,43 @@
              <i class="fas fa-plus-circle mr-1"></i>Adicionar Nova Conta
         </a>
     </div>
+
     {# Parágrafo com estilo 'lead' (texto maior) e margem inferior (mb-4).
        Exibe o total geral formatado pela função/filtro `formatar_br` (provavelmente para moeda BR).
        Assume que `total_geral` é uma variável passada pelo backend. #}
     <p class="lead mb-4">Total Geral de Contas Listadas: <strong>{{ formatar_br(total_geral) }}</strong></p>
+
+    {# --- Seção: Contas Bancárias Individuais --- #}
+    <h2>Contas Bancárias</h2>
+    {% if contas_bancarias %}
+        <ul class="list-group mb-4">
+            {% for conta in contas_bancarias %}
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                    {{ conta.nome }}
+                    <span class="badge badge-primary badge-pill">{{ formatar_br(conta.saldo) }}</span>
+                </li>
+            {% endfor %}
+        </ul>
+        <p class="lead">Total em Contas Bancárias: <strong>{{ formatar_br(total_conta_bancaria) }}</strong></p>
+    {% else %}
+        <div class="alert alert-info">Nenhuma conta bancária cadastrada.</div>
+    {% endif %}
+
+    {# --- Seção: Cartões de Crédito Individuais --- #}
+    <h2>Cartões de Crédito</h2>
+    {% if cartoes %}
+        <ul class="list-group mb-4">
+            {% for cartao in cartoes %}
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                    {{ cartao.nome }}
+                    <span class="badge badge-primary badge-pill">{{ formatar_br(cartao.limite_disponivel) }}</span>
+                </li>
+            {% endfor %}
+        </ul>
+        <p class="lead">Limite Total Disponível nos Cartões: <strong>{{ formatar_br(total_cartao) }}</strong></p>
+    {% else %}
+        <div class="alert alert-info">Nenhum cartão de crédito cadastrado.</div>
+    {% endif %}
 
     {# --- Seção: Total por Categoria --- #}
     {# Título da seção #}
@@ -60,7 +93,7 @@
     {# Verifica se existe a variável `contas_por_categoria` (provavelmente um dicionário onde a chave é a categoria e o valor é uma lista de contas) e se não está vazia. #}
     {% if contas_por_categoria %}
         {# Loop externo: Itera sobre cada categoria e a lista de contas correspondente.
-           `items()|sort` ordena as categorias (provavelmente pelo nome) antes de iterar. #}
+           `items()|sort` ordena os categorias (provavelmente pelo nome) antes de iterar. #}
         {% for categoria, contas_na_categoria in contas_por_categoria.items()|sort %}
             {# Exibe o nome da categoria atual como um título de seção #}
             <h2>{{ categoria }}</h2>
@@ -95,7 +128,7 @@
                             {# Exibe a data de vencimento formatada como DD/MM/YYYY se existir, senão exibe 'N/A'. #}
                             <td>{{ conta.vencimento.strftime('%d/%m/%Y') if conta.vencimento else 'N/A' }}</td>
                             {# Exibe a informação de parcela (ex: "1/12"). Assume que `conta` tem um método `get_parcela_display()`. #}
-                            <td>{{ conta.get_parcela_display() }}</td>
+                            <td>{{ conta.parcela_atual }}/{{ conta.total_parcelas }}</td>
                             {# Exibe um badge (etiqueta) Bootstrap: 'Sim' (azul) se for recorrente, 'Não' (cinza) caso contrário. #}
                             <td>
                                 {% if conta.recorrente %}<span class="badge badge-info">Sim</span>{% else %}<span class="badge badge-secondary">Não</span>{% endif %}
@@ -133,12 +166,11 @@
                     </tbody>
                 </table>
             </div>
-            {# ---- REMOVER ESTE 'td' SOLTO QUE ESTAVA AQUI ---- #} {# Comentário original indicando uma correção prévia #}
-        {% endfor %} {# Fim do loop externo (categorias) #}
-    {% else %} {# Caso `contas_por_categoria` esteja vazio ou não exista #}
+        {% endfor %}
+    {% else %}
          {# Exibe um alerta informativo com um link para adicionar a primeira conta. #}
          <div class="alert alert-info">Nenhuma conta cadastrada ainda. <a href="{{ url_for('add_conta') }}">Adicione sua primeira conta!</a></div>
-    {% endif %} {# Fim do bloco if/else para contas por categoria #}
+    {% endif %}
 
     {# Fim do bloco principal de conteúdo ('content') #}
-    {% endblock %}
+{% endblock %}

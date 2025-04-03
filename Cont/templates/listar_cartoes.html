@@ -60,9 +60,14 @@
                                   - `confirm(...)` abre uma caixa de diálogo de confirmação no navegador.
                                   - Se o usuário clicar "OK", `confirm` retorna `true`, e a submissão do formulário prossegue (`return true`).
                                   - Se o usuário clicar "Cancelar", `confirm` retorna `false`, e a submissão é cancelada (`return false`). #}
-                            <button type="submit" class="btn btn-sm btn-outline-danger"
-                                    onclick="return confirm('Tem certeza que deseja excluir este cartão?');">Excluir
-                            </button>
+                                    <!-- listar_cartoes.html -->
+                                    <button type="button" class="btn btn-sm btn-outline-danger" title="Excluir"
+                                            data-toggle="modal"
+                                            data-target="#confirmDeleteModal"
+                                            data-url-delete="{{ url_for('delete_cartao', id=cartao.id) }}"
+                                            data-item-name="{{ cartao.nome }}">
+                                        Excluir
+                                    </button>
                         </form> {# Fim do formulário de exclusão. #}
                     </td>
                 </tr>

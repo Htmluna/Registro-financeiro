@@ -1,13 +1,14 @@
-# models.py
-import sqlite3 # Embora não usado diretamente aqui, pode ser útil para type hinting se necessário.
-from datetime import date, datetime # Importa classes de data e datetime para manipulação de datas.
-from flask_login import UserMixin # Importa Mixin para integrar a classe User com Flask-Login.
-from werkzeug.security import generate_password_hash, check_password_hash # Funções para hashing seguro de senhas.
-import decimal # Importa a classe Decimal para representação precisa de valores monetários.
+import sqlite3  # Embora não usado diretamente aqui, pode ser útil para type hinting se necessário.
+from datetime import date, datetime  # Importa classes de data e datetime para manipulação de datas.
+from flask_login import UserMixin  # Importa Mixin para integrar a classe User com Flask-Login.
+from werkzeug.security import generate_password_hash, check_password_hash  # Funções para hashing seguro de senhas.
+import decimal  # Importa a classe Decimal para representação precisa de valores monetários.
+
 
 # --- Modelo Categoria ---
 class Categoria:
     """Representa uma categoria para classificar contas (despesas/receitas)."""
+
     def __init__(self, id, nome, user_id):
         """Inicializa um objeto Categoria.
 
@@ -20,18 +21,32 @@ class Categoria:
         self.nome = nome
         self.user_id = user_id
 
+
 # --- Modelo Conta (Despesa/Receita) Atualizado ---
 class Conta:
     """Representa uma conta a pagar ou a receber."""
-    def __init__(self, id, nome, valor, vencimento, categoria_id, # Agora usa categoria_id
-                 parcela_atual, total_parcelas, user_id, recorrente,
-                 tipo_pagamento_id):
+
+    def __init__(
+        self,
+        id,
+        nome,
+        valor,
+        valor_total_compra,
+        vencimento,
+        categoria_id,  # Agora usa categoria_id
+        parcela_atual,
+        total_parcelas,
+        user_id,
+        recorrente,
+        tipo_pagamento_id,
+    ):
         """Inicializa um objeto Conta.
 
         Args:
             id (int): ID único da conta.
             nome (str): Descrição da conta.
             valor (float | str | Decimal): Valor da conta (será convertido para Decimal).
+            valor_total_compra (float | str | Decimal): Valor total da compra.
             vencimento (str | date | datetime): Data de vencimento (será convertida para objeto date).
             categoria_id (int | None): ID da categoria associada (ou None).
             parcela_atual (int | None): Número da parcela atual, se aplicável.
@@ -40,18 +55,31 @@ class Conta:
             recorrente (int | bool): Indica se a conta é recorrente (1/True ou 0/False).
             tipo_pagamento_id (int | None): ID do tipo de pagamento associado (ou None).
         """
+        print(
+            f"DEBUG: Conta.__init__: id={id}, nome={nome}, vencimento={vencimento} (tipo: {type(vencimento)})"
+        )  # NOVO LOG
         self.id = id
         self.nome = nome
         # Garante que o valor seja armazenado como Decimal para precisão monetária.
         # Converte de string ou float, tratando None como 0.00.
-        self.valor = decimal.Decimal(str(valor)) if valor is not None else decimal.Decimal('0.00')
+        self.valor = (
+            decimal.Decimal(str(valor)) if valor is not None else decimal.Decimal("0.00")
+        )
+        self.valor_total_compra = (
+            decimal.Decimal(str(valor_total_compra))
+            if valor_total_compra is not None
+            else decimal.Decimal("0.00")
+        )  # Garante que valor_total_compra seja Decimal
         # Padroniza a data de vencimento para um objeto date usando o método estático format_date.
         self.vencimento = self.format_date(vencimento)
-        self.categoria_id = categoria_id # Armazena o ID da categoria.
+        print(
+            f"DEBUG: Conta.__init__: self.vencimento (apos format_date) = {self.vencimento} (tipo: {type(self.vencimento)})"
+        )  # NOVO LOG
+        self.categoria_id = categoria_id  # Armazena o ID da categoria.
         self.parcela_atual = parcela_atual
         self.total_parcelas = total_parcelas
         self.user_id = user_id
-        self.recorrente = bool(recorrente) # Garante que seja armazenado como booleano.
+        self.recorrente = bool(recorrente)  # Garante que seja armazenado como booleano.
         self.tipo_pagamento_id = tipo_pagamento_id
         # Atributo para armazenar o nome da categoria (preenchido externamente, ex: por JOIN no database.py).
         self.categoria_nome = None
@@ -59,8 +87,11 @@ class Conta:
     @staticmethod
     def format_date(date_input):
         """Tenta converter uma entrada (string, date, datetime) para um objeto date.
-           Prioriza formato ISO 'YYYY-MM-DD'. Retorna None se a conversão falhar.
+        Prioriza formato ISO 'YYYY-MM-DD'. Retorna None se a conversão falhar.
         """
+        print(
+            f"DEBUG: format_date: date_input = {date_input} (tipo: {type(date_input)})"
+        )  # NOVO LOG
         # Se já for date, retorna diretamente.
         if isinstance(date_input, date):
             return date_input
@@ -75,15 +106,17 @@ class Conta:
             # Se falhar no formato ISO, tenta um formato comum (DD/MM/YYYY) como fallback.
             # ATENÇÃO: É melhor garantir que os dados sejam salvos/lidos em formato ISO no banco.
             try:
-                return datetime.strptime(str(date_input), '%d/%m/%Y').date()
+                return datetime.strptime(str(date_input), "%d/%m/%Y").date()
             except (ValueError, TypeError):
                 # Se todas as tentativas falharem, retorna None.
-                print(f"AVISO (Conta.format_date): Não foi possível converter '{date_input}' para data.")
+                print(
+                    f"AVISO (Conta.format_date): Não foi possível converter '{date_input}' para data."
+                )
                 return None
 
     def get_parcela_display(self):
         """Retorna uma string formatada para exibição de parcelas (ex: "1/12")
-           ou "-" se não for parcelado.
+        ou "-" se não for parcelado.
         """
         # Verifica se há um total de parcelas definido.
         if self.total_parcelas:
@@ -93,10 +126,12 @@ class Conta:
             # Se não for parcelado, retorna um hífen.
             return "-"
 
+
 # --- Modelo User (Usuário) ---
 # Integra-se com Flask-Login usando UserMixin.
 class User(UserMixin):
     """Representa um usuário da aplicação."""
+
     def __init__(self, id, username, password):
         """Inicializa um objeto User.
 
@@ -140,9 +175,9 @@ class User(UserMixin):
     # get_id(): Retorna self.id (convertido para string), usado pelo Flask-Login para serializar na sessão.
 
 
-# --- Modelo Cartao (Cartão de Crédito) ---
 class Cartao:
     """Representa um cartão de crédito (um tipo de pagamento)."""
+
     def __init__(self, id, nome, limite, limite_disponivel, user_id):
         """Inicializa um objeto Cartao.
 
@@ -156,14 +191,22 @@ class Cartao:
         self.id = id
         self.nome = nome
         # Converte limite para Decimal para consistência e precisão. Trata None.
-        self.limite = decimal.Decimal(str(limite)) if limite is not None else decimal.Decimal('0.00')
+        self.limite = (
+            decimal.Decimal(str(limite)) if limite is not None else decimal.Decimal("0.00")
+        )
         # Converte limite disponível para Decimal. Trata None.
-        self.limite_disponivel = decimal.Decimal(str(limite_disponivel)) if limite_disponivel is not None else decimal.Decimal('0.00')
+        self.limite_disponivel = (
+            decimal.Decimal(str(limite_disponivel))
+            if limite_disponivel is not None
+            else decimal.Decimal("0.00")
+        )
         self.user_id = user_id
+
 
 # --- Modelo ContaBancaria ---
 class ContaBancaria:
     """Representa uma conta bancária (um tipo de pagamento)."""
+
     def __init__(self, id, nome, saldo, user_id):
         """Inicializa um objeto ContaBancaria.
 
@@ -176,5 +219,7 @@ class ContaBancaria:
         self.id = id
         self.nome = nome
         # Converte saldo para Decimal para consistência e precisão. Trata None.
-        self.saldo = decimal.Decimal(str(saldo)) if saldo is not None else decimal.Decimal('0.00')
+        self.saldo = (
+            decimal.Decimal(str(saldo)) if saldo is not None else decimal.Decimal("0.00")
+        )
         self.user_id = user_id
