@@ -4,215 +4,386 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sua Gestão Financeira Simplificada</title>
+    <meta name="description" content="Controle suas finanças com facilidade. Gerencie contas, cartões e orçamentos em um só lugar. Comece agora!">
+    <meta name="keywords" content="gestão financeira, finanças pessoais, controle de gastos, orçamento, cartões de crédito">
+    <meta name="author" content="[Seu Nome ou Nome da Empresa]">
+
+    <!-- Favicon -->
+    <link rel="icon" href="favicon.ico" type="image/x-icon">
+
+    <!-- Google Fonts - Poppins e Open Sans (para melhor legibilidade) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+
     <!-- Bootstrap CSS -->
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <!-- Font Awesome para Ícones -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-    <!-- Estilos Customizados -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Animate.css para efeitos sutis -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+
+    <!-- CSS Personalizado -->
     <style>
-        /* Define variáveis CSS (custom properties) no escopo raiz (:root) para fácil customização do tema */
         :root {
-            --primary-color: #4682B4; /* Steel Blue (mesmo do seu app) */
-            --secondary-color: #6c757d; /* Cinza Secundário */
-            --light-bg: #f8f9fa; /* Cinza bem claro */
-            --dark-text: #343a40; /* Texto escuro */
-            --card-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.1); /* Sombra mais pronunciada */
+            --primary-color: #1e88e5; /* Azul mais moderno e vibrante */
+            --secondary-color: #78909c; /* Cinza azulado para um toque elegante */
+            --light-bg: #f5f5f5; /* Cinza claro suave */
+            --dark-text: #263238; /* Cinza escuro para texto */
+            --card-shadow: 0 0.75rem 1.5rem rgba(0, 0, 0, 0.08); /* Sombra mais suave */
+            --transition-duration: 0.3s; /* Duração padrão para transições */
         }
 
         body {
-            font-family: 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', Arial, 'Noto Sans', sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+            font-family: 'Open Sans', sans-serif; /* Fonte para melhor legibilidade */
             background-color: var(--light-bg);
             color: var(--dark-text);
+            line-height: 1.6; /* Melhora a legibilidade do texto */
         }
 
+        /* Hero Section - Mais moderna com gradiente sutil e espaçamento */
         .hero-section {
-            background: linear-gradient(to right, var(--primary-color), #5a9bd5); /* Gradiente azul */
+            background: linear-gradient(135deg, var(--primary-color) 0%, #0d47a1 100%); /* Gradiente diagonal */
             color: white;
-            padding: 5rem 1rem;
+            padding: 8rem 1rem; /* Mais espaçamento */
             text-align: center;
-            margin-bottom: 3rem;
+            margin-bottom: 4rem;
+            position: relative; /* Para posicionar o efeito de onda */
+            overflow: hidden; /* Esconde a onda que ultrapassa */
+        }
+
+        /* Efeito de onda sutil no fundo do Hero */
+        .hero-section::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 100px; /* Ajuste a altura da onda */
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 120" preserveAspectRatio="none"><path d="M0,56.5C132,118.9,340,108.4,464,56.5C588,4.7,794,0,900,0C1020,0,1120,4.7,1200,56.5V120H0V56.5Z" fill="white"/></svg>');
+            background-size: 100% 100px; /* Ajuste o tamanho da onda */
         }
 
         .hero-section h1 {
-            font-size: 2.8rem;
-            font-weight: 600;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 700;
+            font-size: 3rem; /* Tamanho maior para impacto */
             margin-bottom: 1rem;
         }
 
         .hero-section p {
             font-size: 1.2rem;
+            font-weight: 500;
             margin-bottom: 2rem;
         }
 
-        .btn-login-landing {
+        /* Botões Customizados - Mais arredondados e com sombra */
+        .btn-custom {
             font-size: 1.1rem;
-            padding: 0.8rem 2rem;
-            background-color: white;
-            color: var(--primary-color);
-            border: 2px solid white;
+            padding: 0.75rem 1.75rem;
+            border-radius: 50px; /* Mais arredondado */
             font-weight: 600;
-            transition: all 0.3s ease;
-        }
-        .btn-login-landing:hover {
-            background-color: transparent;
-            color: white;
+            transition: all var(--transition-duration);
+            box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.1); /* Sombra suave */
         }
 
+        .btn-primary {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+
+        .btn-primary:hover {
+            background-color: #0d47a1;
+            border-color: #0d47a1;
+            transform: translateY(-2px); /* Leve elevação no hover */
+            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.2); /* Sombra mais forte no hover */
+        }
+
+        .btn-outline-light:hover {
+            background-color: rgba(255, 255, 255, 0.2); /* Feedback visual no hover */
+        }
+
+
+        /* Feature Cards - Animação sutil e design limpo */
         .feature-card {
             background-color: #fff;
             border: none;
-            border-radius: 10px;
+            border-radius: 20px; /* Mais arredondado */
             box-shadow: var(--card-shadow);
-            margin-bottom: 2rem;
-            padding: 2rem;
+            padding: 2.5rem; /* Mais espaçamento interno */
             text-align: center;
-            transition: transform 0.2s ease-in-out;
-            height: 100%; /* Faz todos os cards terem a mesma altura na linha */
+            transition: transform var(--transition-duration), box-shadow var(--transition-duration);
+            height: 100%;
             display: flex;
             flex-direction: column;
-            justify-content: flex-start; /* Alinha conteúdo no topo */
+            justify-content: center;
         }
 
         .feature-card:hover {
-            transform: translateY(-5px); /* Efeito de levantar no hover */
+            transform: translateY(-4px); /* Elevação mais sutil */
+            box-shadow: 0 1rem 2rem rgba(0, 0, 0, 0.1); /* Sombra mais pronunciada no hover */
         }
 
         .feature-icon {
-            font-size: 3rem;
+            font-size: 3.5rem; /* Ícones maiores */
             color: var(--primary-color);
-            margin-bottom: 1.5rem;
+            margin-bottom: 1.75rem;
         }
 
         .feature-card h3 {
-            color: var(--primary-color);
+            font-family: 'Poppins', sans-serif;
             font-weight: 600;
-            margin-bottom: 1rem;
+            margin-bottom: 0.75rem;
         }
 
-        .section-title {
+        .feature-card p {
+            color: var(--secondary-color);
+        }
+
+        /* Testimonial Section - Design mais clean */
+        .testimonial-section {
+            background-color: #fff;
+            padding: 5rem 1rem; /* Mais espaçamento */
             text-align: center;
-            margin-bottom: 3rem;
-            font-weight: 600;
-            color: var(--dark-text);
         }
 
+        .testimonial-carousel {
+            overflow: hidden;
+        }
+
+        .testimonial-slide {
+            display: none; /* Inicialmente esconde todos os slides */
+        }
+
+        .testimonial-slide.active {
+            display: block; /* Mostra o slide ativo */
+        }
+
+        .testimonial {
+            max-width: 700px; /* Largura maior */
+            margin: auto;
+            font-style: italic;
+            color: var(--secondary-color);
+            font-size: 1.1rem; /* Tamanho maior para melhor legibilidade */
+            margin-bottom: 1.5rem;
+        }
+
+        .testimonial-author {
+            font-weight: bold;
+            margin-top: 1rem;
+            color: var(--dark-text);
+            font-size: 1rem;
+        }
+
+        /* CTA Section - Layout aprimorado */
         .cta-section {
             background-color: var(--primary-color);
             color: white;
-            padding: 4rem 1rem;
+            padding: 5rem 1rem; /* Mais espaçamento */
             text-align: center;
-            margin-top: 3rem;
+            margin-top: 4rem;
+            border-radius: 15px; /* Borda arredondada para suavizar */
         }
 
-         .cta-section h2 {
-            margin-bottom: 2rem;
-         }
+        .cta-section h2 {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 700;
+            font-size: 2.5rem; /* Tamanho maior */
+            margin-bottom: 1.5rem;
+        }
 
+        /* Footer - Mais clean e com espaçamento */
         footer {
-            padding: 2rem 0;
+            padding: 3rem 0; /* Mais espaçamento */
             text-align: center;
             font-size: 0.9rem;
+            background-color: #e9ecef;
             color: var(--secondary-color);
-            background-color: #e9ecef; /* Fundo levemente cinza */
         }
 
+        /* Media Queries - Responsividade aprimorada */
+        @media (max-width: 768px) {
+            .hero-section {
+                padding: 6rem 1rem;
+            }
+
+            .hero-section h1 {
+                font-size: 2.5rem;
+            }
+
+            .feature-card {
+                padding: 1.5rem;
+            }
+
+            .feature-icon {
+                font-size: 2.5rem;
+            }
+
+            .cta-section h2 {
+                font-size: 2rem;
+            }
+        }
+
+        /* Animações */
+        .animate__animated.animate__fadeIn {
+            --animate-duration: 1s; /* Duração padrão da animação */
+        }
     </style>
 </head>
 <body>
 
-    <!-- Seção Hero (Cabeçalho Principal) -->
-    <section class="hero-section">
+    <!-- Navbar (Opcional - adicione se precisar) -->
+    <!--
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
         <div class="container">
-            <h1>Organize suas Finanças Pessoais de Forma Inteligente</h1>
-            <p>Controle total sobre suas contas, cartões e orçamento em um só lugar. Simples, seguro e eficiente.</p>
-            <a href="{{ url_for('login') }}" class="btn btn-login-landing">Acessar Minha Conta</a>
-            <span class="mx-2 text-white-50">ou</span>
-            <a href="{{ url_for('register') }}" class="btn btn-outline-light">Criar Conta Grátis</a>
+            <a class="navbar-brand" href="#">[Nome da Sua Marca]</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Recursos</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Preços</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Contato</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link btn btn-primary btn-sm" href="{{ url_for('login') }}">Login</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    -->
+
+    <!-- Hero Section -->
+    <section class="hero-section animate__animated animate__fadeIn">
+        <div class="container">
+            <h1 class="fw-bold">Gerencie suas Finanças com Facilidade</h1>
+            <p>Controle total sobre suas contas, cartões e orçamento. Tudo em um só lugar.  Simplifique sua vida financeira.</p>
+            <a href="{{ url_for('login') }}" class="btn btn-light btn-custom">Acessar Minha Conta</a>
+            <a href="{{ url_for('register') }}" class="btn btn-outline-light btn-custom">Criar Conta Grátis</a>
         </div>
     </section>
 
-    <!-- Seção de Funcionalidades -->
-    <section class="container features-section">
-        <h2 class="section-title">Recursos Poderosos para Você</h2>
-
+    <!-- Features Section -->
+    <section class="container">
+        <h2 class="text-center fw-bold mb-5">Recursos Poderosos para Você</h2>
         <div class="row">
-            <!-- Card 1: Dashboard -->
-            <div class="col-lg-4 col-md-6 mb-4 d-flex">
-                <div class="card feature-card">
+            <div class="col-lg-4 col-md-6 mb-4 animate__animated animate__fadeInUp">
+                <div class="feature-card">
                     <i class="fas fa-tachometer-alt feature-icon"></i>
                     <h3>Dashboard Intuitivo</h3>
-                    <p class="card-text">Visualize rapidamente o status das suas contas do mês atual e próximo, totais e saldos.</p>
+                    <p>Visualize rapidamente o status das suas contas e saldos, com gráficos claros e informações relevantes.</p>
                 </div>
             </div>
-
-            <!-- Card 2: Contas -->
-            <div class="col-lg-4 col-md-6 mb-4 d-flex">
-                <div class="card feature-card">
-                    <i class="fas fa-file-invoice-dollar feature-icon"></i>
-                    <h3>Controle Total de Contas</h3>
-                    <p class="card-text">Registre despesas e receitas detalhadamente, com vencimento, parcelas, recorrência e forma de pagamento.</p>
-                </div>
-            </div>
-
-            <!-- Card 3: Categorias -->
-            <div class="col-lg-4 col-md-6 mb-4 d-flex">
-                <div class="card feature-card">
-                    <i class="fas fa-tags feature-icon"></i>
-                    <h3>Organização por Categorias</h3>
-                    <p class="card-text">Crie suas próprias categorias e classifique suas transações para entender melhor seus gastos.</p>
-                </div>
-            </div>
-
-             <!-- Card 4: Cartões -->
-            <div class="col-lg-4 col-md-6 mb-4 d-flex">
-                <div class="card feature-card">
+            <div class="col-lg-4 col-md-6 mb-4 animate__animated animate__fadeInUp" data-wow-delay="0.2s">
+                <div class="feature-card">
                     <i class="fas fa-credit-card feature-icon"></i>
-                    <h3>Gerencie seus Cartões</h3>
-                    <p class="card-text">Cadastre seus cartões, defina limites e acompanhe o limite disponível automaticamente.</p>
+                    <h3>Controle de Cartões</h3>
+                    <p>Gerencie limites, faturas e acompanhe seus gastos de maneira eficiente, evitando surpresas no fim do mês.</p>
                 </div>
             </div>
-
-             <!-- Card 5: Contas Bancárias -->
-            <div class="col-lg-4 col-md-6 mb-4 d-flex">
-                <div class="card feature-card">
-                    <i class="fas fa-landmark feature-icon"></i>
-                    <h3>Contas Bancárias</h3>
-                    <p class="card-text">Registre suas contas bancárias e veja o saldo ser atualizado conforme as movimentações.</p>
-                </div>
-            </div>
-
-            <!-- Card 6: Relatórios -->
-            <div class="col-lg-4 col-md-6 mb-4 d-flex">
-                <div class="card feature-card">
+            <div class="col-lg-4 col-md-6 mb-4 animate__animated animate__fadeInUp" data-wow-delay="0.4s">
+                <div class="feature-card">
                     <i class="fas fa-chart-bar feature-icon"></i>
-                    <h3>Relatórios Mensais</h3>
-                    <p class="card-text">Analise seus gastos por período e categoria com relatórios detalhados e fáceis de entender.</p>
+                    <h3>Relatórios Detalhados</h3>
+                    <p>Analise seus gastos por período e categoria, identifique oportunidades de economia e tome decisões financeiras mais inteligentes.</p>
+                </div>
+            </div>
+            <div class="col-lg-4 col-md-6 mb-4 animate__animated animate__fadeInUp" data-wow-delay="0.6s">
+                <div class="feature-card">
+                   <i class="fas fa-bell feature-icon"></i>
+                    <h3>Alertas Personalizados</h3>
+                    <p>Receba notificações sobre vencimentos de contas, limites de gastos e outras informações importantes para manter suas finanças em dia.</p>
+                </div>
+            </div>
+            <div class="col-lg-4 col-md-6 mb-4 animate__animated animate__fadeInUp" data-wow-delay="0.8s">
+                <div class="feature-card">
+                    <i class="fas fa-lock feature-icon"></i>
+                    <h3>Segurança Avançada</h3>
+                    <p>Protegemos seus dados com as mais recentes tecnologias de segurança, garantindo a confidencialidade e integridade das suas informações financeiras.</p>
+                </div>
+            </div>
+            <div class="col-lg-4 col-md-6 mb-4 animate__animated animate__fadeInUp" data-wow-delay="1.0s">
+                <div class="feature-card">
+                    <i class="fas fa-piggy-bank feature-icon"></i>
+                    <h3>Metas de Economia</h3>
+                    <p>Defina metas de economia, acompanhe seu progresso e alcance seus objetivos financeiros com mais facilidade e motivação.</p>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- Testimonial Section - Carrossel -->
+    <section class="testimonial-section">
+        <div class="container">
+            <h2 class="fw-bold">O que nossos usuários dizem</h2>
+            <div id="testimonialCarousel" class="testimonial-carousel">
+                <div class="testimonial-slide active">
+                    <p class="testimonial">“Este aplicativo revolucionou minha vida financeira! Agora consigo planejar minhas despesas de forma eficiente e alcançar meus objetivos com mais facilidade.”</p>
+                    <p class="testimonial-author">— Maria Souza</p>
+                </div>
+                <div class="testimonial-slide">
+                    <p class="testimonial">“Finalmente encontrei uma ferramenta que me ajuda a ter controle total sobre meus gastos. Recomendo a todos que querem organizar suas finanças!”</p>
+                    <p class="testimonial-author">— Carlos Oliveira</p>
+                </div>
+                 <div class="testimonial-slide">
+                    <p class="testimonial">“A interface é muito intuitiva e os relatórios me ajudam a entender onde estou gastando meu dinheiro. Estou muito satisfeito com o [Nome da Sua Marca]!”</p>
+                    <p class="testimonial-author">— Ana Santos</p>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Seção Call to Action (Chamada para Ação) -->
+    <!-- CTA Section -->
     <section class="cta-section">
         <div class="container">
             <h2>Pronto para Assumir o Controle Financeiro?</h2>
-            <a href="{{ url_for('login') }}" class="btn btn-light btn-lg">Fazer Login Agora</a>
-             <p class="mt-3"><small>Novo por aqui? <a href="{{ url_for('register') }}" class="text-white-50"><u>Crie sua conta</u></a>.</small></p>
+            <p>Comece agora mesmo a organizar suas finanças e alcançar seus objetivos!</p>
+            <a href="{{ url_for('login') }}" class="btn btn-light btn-lg btn-custom">Fazer Login</a>
+            <p class="mt-3"><small>Novo por aqui? <a href="{{ url_for('register') }}" class="text-white"><u>Crie sua conta</u></a></small></p>
         </div>
     </section>
 
-    <!-- Rodapé -->
+    <!-- Footer -->
     <footer>
         <div class="container">
-
-            {# Você pode adicionar links para Política de Privacidade, Termos, etc. aqui #}
+            <p>© 2025 [Nome da Sua Marca]. Todos os direitos reservados.</p>
+            <p><a href="#" class="text-muted">Termos de Serviço</a> | <a href="#" class="text-muted">Política de Privacidade</a></p>
         </div>
     </footer>
 
-    <!-- Bootstrap JS e dependências (jQuery e Popper.js) -->
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <!-- Bootstrap Bundle com Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
+    <!-- JavaScript Personalizado para o Carrossel -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const slides = document.querySelectorAll('.testimonial-slide');
+            let currentSlide = 0;
+
+            function showSlide(n) {
+                slides.forEach(slide => slide.classList.remove('active'));
+                slides[n].classList.add('active');
+            }
+
+            function nextSlide() {
+                currentSlide = (currentSlide + 1) % slides.length;
+                showSlide(currentSlide);
+            }
+
+            // Inicia o carrossel
+            showSlide(currentSlide);
+            setInterval(nextSlide, 5000); // Troca de slide a cada 5 segundos
+        });
+    </script>
 </body>
 </html>
