@@ -47,7 +47,7 @@
             {% for cartao in cartoes %}
                 <li class="list-group-item d-flex justify-content-between align-items-center">
                     {{ cartao.nome }}
-                    <span class="badge badge-primary badge-pill">{{ formatar_br(cartao.limite_disponivel) }}</span>
+                    <span class="badge badge-primary badge-pill" style="font-size: 90%;">{{ formatar_br(cartao.limite_disponivel) }}</span>
                 </li>
             {% endfor %}
         </ul>
