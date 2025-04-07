@@ -1,0 +1,225 @@
+{# Indica que este template herda a estrutura e blocos do template 'base.html'. #}
+{% extends 'base.html' %}
+
+{# Define o título específico para esta página (Registro). #}
+{% block title %}Registro{% endblock %}
+
+{# Início do bloco principal de conteúdo ('content'). #}
+{% block content %}
+{# Linha Bootstrap para conter a coluna e centralizá-la horizontalmente (`justify-content-center`).
+   `mt-5` adiciona uma margem significativa no topo. #}
+<div class="row justify-content-center align-items-center" style="min-height: 80vh;">
+    {# Coluna Bootstrap. Ocupa 7 de 12 colunas em telas médias (`md`) ou maiores,
+       e 6 de 12 colunas em telas grandes (`lg`) ou maiores. Ligeiramente maior que o login para acomodar mais campos. #}
+    <div class="col-md-7 col-lg-6">
+        {# Card Bootstrap: container com borda e fundo. `shadow-sm` adiciona uma sombra sutil. #}
+        <div class="card custom-card shadow-lg">
+            {# Corpo do card. `p-4` adiciona padding interno. #}
+            <div class="card-body p-5">
+                {# Título do card, centralizado (`text-center`) e com margem inferior (`mb-4`). #}
+                <h2 class="card-title text-center mb-5 custom-title">Crie sua conta</h2>
+                {# Início do formulário de registro. `method="post"` envia dados de forma segura.
+                   `novalidate` desativa validação HTML padrão, confiando na validação do backend (Flask/WTForms). #}
+                <form method="post" novalidate>
+                    {# Renderiza campos ocultos, como o token CSRF para segurança. #}
+                    {{ form.hidden_tag() }}
+
+                    {# Agrupamento para o campo 'username'. `mb-3` adiciona margem inferior. #}
+                    <div class="mb-4">
+                        {# Renderiza a tag <label> para o username com classe Bootstrap 'form-label'. #}
+                        {{ form.username.label(class="form-label custom-label") }}
+                        {# Renderiza o campo <input> para username.
+                           `class='form-control form-control-lg'` aplica estilo Bootstrap padrão e torna o campo maior. #}
+                        {{ form.username(class='form-control custom-input form-control-lg') }}
+                         {# Bloco condicional para exibir erros de validação do username. #}
+                         {% if form.username.errors %}
+                            {# Container para erros com estilo Bootstrap 'invalid-feedback'.
+                               `d-block` força a exibição, pois não estamos usando a classe 'is-invalid' no input aqui. #}
+                            <div class="invalid-feedback d-block custom-error">
+                                {# Loop para exibir cada erro encontrado para o campo username. #}
+                                {% for error in form.username.errors %}
+                                    <span>{{ error }}</span> {# Exibe o texto do erro. #}
+                                {% endfor %}
+                            </div>
+                        {% endif %} {# Fim do bloco de erros para username. #}
+                    </div>
+
+                    {# Agrupamento para o campo 'password'. `mb-3` adiciona margem inferior. #}
+                    <div class="mb-4">
+                        {# Renderiza a tag <label> para password. #}
+                        {{ form.password.label(class="form-label custom-label") }}
+                        {# Renderiza o campo <input type="password"> para password, com estilo grande. #}
+                        {{ form.password(class='form-control custom-input form-control-lg') }}
+                         {# Bloco condicional para exibir erros de validação do password. #}
+                         {% if form.password.errors %}
+                            <div class="invalid-feedback d-block custom-error">
+                                {% for error in form.password.errors %}
+                                    <span>{{ error }}</span>
+                                {% endfor %}
+                            </div>
+                        {% endif %} {# Fim do bloco de erros para password. #}
+                    </div>
+
+                    {# Agrupamento para o campo 'confirm_password'. `mb-4` adiciona margem inferior maior antes do botão. #}
+                    <div class="mb-4">
+                        {# Renderiza a tag <label> para confirmar a senha. #}
+                        {{ form.confirm_password.label(class="form-label custom-label") }}
+                        {# Renderiza o campo <input type="password"> para confirmar a senha, com estilo grande. #}
+                        {{ form.confirm_password(class='form-control custom-input form-control-lg') }}
+                         {# Bloco condicional para exibir erros de validação da confirmação de senha (ex: senhas não conferem). #}
+                         {% if form.confirm_password.errors %}
+                            <div class="invalid-feedback d-block custom-error">
+                                {% for error in form.confirm_password.errors %}
+                                    <span>{{ error }}</span>
+                                {% endfor %}
+                            </div>
+                        {% endif %} {# Fim do bloco de erros para confirm_password. #}
+                    </div>
+
+                    {# Container Bootstrap para o botão de submit usando display grid (`d-grid`) para botão de largura total.
+                       `mb-3` adiciona margem inferior. #}
+                    <div class="d-grid gap-2 mb-4">
+                        {# Renderiza o botão <button type="submit"> para submeter o formulário.
+                           `class='btn btn-primary btn-lg'` aplica estilo Bootstrap de botão primário (azul) e grande. #}
+                        {{ form.submit(class='btn btn-primary custom-button btn-lg') }}
+                    </div>
+
+                    {# Parágrafo centralizado (`text-center`) com margem no topo (`mt-3`). #}
+                    <p class="text-center mt-4 custom-text">
+                        Já tem uma conta? {# Texto informativo. #}
+                        {# Link para a página de login. `url_for('login')` gera o URL dinamicamente. #}
+                        <a href="{{ url_for('login') }}" class="custom-link">Faça login</a>.
+                    </p>
+                </form> {# Fim do formulário. #}
+            </div> {# Fim do card-body. #}
+        </div> {# Fim do card. #}
+    </div> {# Fim da coluna. #}
+</div> {# Fim da linha. #}
+
+<style>
+    /* Cores */
+    :root {
+        --primary-color: #3498db;
+        --secondary-color: #7f8c8d;
+        --light-color: #ecf0f1;
+        --dark-color: #2c3e50;
+    }
+
+    /* Estilos Gerais */
+    body {
+        background-color: var(--light-color);
+        color: var(--dark-color);
+    }
+
+    .custom-card {
+        border: none;
+        border-radius: 15px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+    }
+
+    .custom-card-body {
+        padding: 2rem;
+    }
+
+    .custom-title {
+        font-size: 2.2rem;
+        font-weight: 700;
+        color: var(--primary-color);
+    }
+
+    .custom-label {
+        font-weight: 500;
+        color: var(--secondary-color);
+    }
+
+    .custom-input {
+        border-radius: 10px;
+        border: 1px solid var(--secondary-color);
+        padding: 1rem;
+        font-size: 1.1rem;
+        color: var(--dark-color);
+    }
+
+    .custom-input:focus {
+        border-color: var(--primary-color);
+        box-shadow: none;
+    }
+
+    .custom-button {
+        background-color: var(--primary-color);
+        border: none;
+        border-radius: 10px;
+        padding: 1rem 2rem;
+        font-size: 1.2rem;
+        font-weight: 600;
+        color: var(--light-color);
+        transition: background-color 0.3s ease;
+    }
+
+    .custom-button:hover {
+        background-color: #2980b9;
+    }
+
+    .custom-link {
+        color: var(--primary-color);
+        text-decoration: none;
+        font-weight: 500;
+    }
+
+    .custom-link:hover {
+        text-decoration: underline;
+    }
+
+    .custom-text {
+        color: var(--secondary-color);
+    }
+
+    .custom-error {
+        color: #e74c3c;
+        font-size: 0.9rem;
+    }
+
+    /* Estilos para o botão "Voltar ao site" */
+    .custom-back-button {
+        font-weight: 500;
+        transition: all 0.3s ease;
+        padding: 0.5rem 1rem;
+        display: inline-flex;
+        align-items: center;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        text-decoration: none;
+        color: #6c757d;
+        border-color: #6c757d;
+        border-radius: 10px; /* Arredondamento sutil */
+    }
+
+    .custom-back-button i {
+        font-size: 0.9rem;
+        margin-right: 0.3em; /* Espaçamento entre o ícone e o texto */
+    }
+
+    .custom-back-button:hover {
+        background-color: #e9ecef;
+        border-color: #5a6268;
+        color: #5a6268;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15);
+    }
+
+    @media (max-width: 576px) {
+        .custom-back-button {
+            font-size: 0.8rem;
+            padding: 0.4rem 0.8rem;
+        }
+
+        .custom-back-button i {
+            font-size: 0.7rem;
+        }
+    }
+
+    /* Alinhamento Vertical */
+    .row.align-items-center {
+        min-height: 80vh; /* Garante que a linha ocupe pelo menos 80% da altura da tela */
+    }
+</style>
+{% endblock %} {# Fim do bloco 'content'. #}

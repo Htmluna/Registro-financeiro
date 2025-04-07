@@ -1,0 +1,218 @@
+{# Indica que este template herda a estrutura e blocos do template 'base.html'. #}
+{% extends 'base.html' %}
+
+{# Define o título da página, incluindo dinamicamente o mês e ano do relatório.
+   Assume que 'nome_mes' (ex: "Outubro") e 'ano' são passados pelo backend. #}
+{% block title %}Relatório - {{ nome_mes }}/{{ ano }}{% endblock %}
+
+{# Início do bloco principal de conteúdo ('content'). #}
+{% block content %}
+    {# Container Flexbox para alinhar o título à esquerda e o botão à direita, verticalmente centrado. `mb-3` adiciona margem inferior. #}
+    <div class="d-flex justify-content-between align-items-center mb-3">
+         {# Título principal exibindo o mês e ano do relatório. #}
+         <h1>Relatório Mensal: {{ nome_mes }} de {{ ano }}</h1>
+         {# Link (estilizado como botão secundário pequeno) para voltar à página de seleção de relatório.
+            - `url_for('selecionar_relatorio', ...)`: Gera o URL para a rota de seleção.
+            - `mes=mes, ano=ano`: Passa o mês e ano atuais de volta para pré-selecionar na página de seleção.
+            - `categoria_id=request.args.getlist('categoria_id')`: IMPORTANTE: Pega a lista de IDs de categoria da URL ATUAL (que gerou este relatório)
+              e passa de volta para a página de seleção, para que as categorias previamente selecionadas permaneçam marcadas. #}
+         <a href="{{ url_for('selecionar_relatorio', mes=mes, ano=ano, categoria_id=request.args.getlist('categoria_id')) }}" class="btn btn-secondary btn-sm">
+              {# Ícone Font Awesome de filtro com margem direita. #}
+              <i class="fas fa-filter mr-1"></i>Alterar Seleção
+         </a>
+    </div>
+
+    {# --- Seção de Informação do Filtro Ativo --- #}
+    {# Bloco condicional: Exibe esta seção apenas se um filtro de categoria foi aplicado.
+       Assume que 'selected_categories_display' (uma lista de nomes de categorias selecionadas) é passada pelo backend se filtros estiverem ativos. #}
+    {% if selected_categories_display %}
+        {# Alerta Bootstrap informativo, pequeno, com botão de fechar e animação fade. `mb-3` adiciona margem inferior. #}
+        <div class="alert alert-info alert-dismissible fade show small mb-3" role="alert">
+          {# Indica que um filtro está ativo. #}
+          <strong>Filtro ativo:</strong>
+          {# Loop para exibir cada nome de categoria selecionada como um badge (etiqueta). #}
+          {% for cat_name in selected_categories_display %}
+              {# Badge Bootstrap primário (azul) com margem direita. #}
+              <span class="badge badge-primary mr-1">{{ cat_name }}</span>
+          {% endfor %}
+          {# Link para limpar APENAS o filtro de categoria.
+             - Vai para a mesma rota de visualização (`visualizar_relatorio_mensal`), mas passa APENAS 'mes' e 'ano',
+               removendo efetivamente os parâmetros 'categoria_id' da URL da próxima requisição.
+             - `alert-link ml-2`: Estilo Bootstrap para link dentro de alerta, com margem esquerda. #}
+          <a href="{{ url_for('visualizar_relatorio_mensal', mes=mes, ano=ano) }}" class="alert-link ml-2">(Limpar Filtro de Categoria)</a>
+          {# Botão Bootstrap padrão para fechar o alerta. `py-1 px-2` ajusta o padding. #}
+          <button type="button" class="close py-1 px-2" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">×</span> {# Ícone 'x' para fechar. #}
+          </button>
+        </div>
+    {% endif %} {# Fim do bloco if selected_categories_display. #}
+
+    {# --- Seção: Resumo do Mês --- #}
+    {# Card Bootstrap para agrupar o resumo. `mb-4` adiciona margem inferior, `shadow-sm` adiciona sombra sutil. #}
+    <div class="card mb-4 shadow-sm">
+        {# Cabeçalho do card. #}
+        <div class="card-header">Resumo do Mês</div>
+        {# Corpo do card. #}
+        <div class="card-body">
+             {# Parágrafo exibindo o total gasto no mês.
+                - `h4`: Estilo de cabeçalho nível 4.
+                - `text-danger`: Destaca o total (geralmente em vermelho).
+                - `mb-3`: Margem inferior.
+                - `formatar_br(total_mes)`: Formata a variável 'total_mes' (do backend) como moeda BR. #}
+             <p class="h4 text-danger mb-3">Total Gasto: <strong>{{ formatar_br(total_mes) }}</strong></p>
+
+            {# Bloco condicional: Exibe os totais por categoria apenas se houver dados.
+               Assume que 'total_por_categoria_mes' (um dicionário categoria:total) é passado pelo backend. #}
+            {% if total_por_categoria_mes %}
+                {# Subtítulo para os totais por categoria. #}
+                <h5>Totais por Categoria</h5>
+                 {# Lista Bootstrap (`list-group`) para exibir os totais por categoria de forma limpa. `list-group-flush` remove bordas laterais. #}
+                 <ul class="list-group list-group-flush">
+                    {# Loop através dos itens (categoria, total) do dicionário, ordenados pelo nome da categoria (`|sort`). #}
+                    {% for categoria, total in total_por_categoria_mes.items()|sort %}
+                         {# Item da lista.
+                            - `list-group-item`: Estilo base do item.
+                            - `d-flex justify-content-between align-items-center`: Alinha o nome à esquerda e o total (badge) à direita.
+                            - `py-2`: Adiciona padding vertical. #}
+                         <li class="list-group-item d-flex justify-content-between align-items-center py-2">
+                            {{ categoria }} {# Nome da categoria. #}
+                            {# Badge Bootstrap secundário (cinza) e arredondado (`badge-pill`) para exibir o total formatado. #}
+                            <span class="badge badge-secondary badge-pill">{{ formatar_br(total) }}</span>
+                         </li>
+                    {% endfor %} {# Fim do loop de totais por categoria. #}
+                 </ul>
+            {# Bloco `else` do `if total_por_categoria_mes`: Exibido se não houver gastos. #}
+            {% else %}
+                 <p class="text-muted">Nenhum gasto registrado neste período.</p>
+            {% endif %} {# Fim do if/else para totais por categoria. #}
+        </div> {# Fim do card-body. #}
+    </div> {# Fim do card de resumo. #}
+
+    {# --- Seção: Detalhes das Contas do Mês --- #}
+    {# Título da seção de detalhes. #}
+    <h2>Detalhes das Contas</h2>
+    {# Container para a tabela de detalhes.
+       - `report-container`: Classe personalizada usada pelos estilos de impressão para isolar este conteúdo.
+       - `table-responsive`: Permite scroll horizontal em telas pequenas.
+       - `mb-4`: Margem inferior. #}
+    <div class="report-container table-responsive mb-4">
+        {# Tabela Bootstrap com bordas (`table-bordered`), efeito hover (`table-hover`) e tamanho compacto (`table-sm`). #}
+        <table class="table table-bordered table-hover table-sm">
+            {# Cabeçalho da tabela com fundo claro (`thead-light`). #}
+            <thead class="thead-light">
+                <tr>
+                    <th>Nome</th>          {# Coluna Nome da Conta #}
+                    <th>Valor</th>         {# Coluna Valor #}
+                    <th>Vencimento</th>    {# Coluna Data de Vencimento #}
+                    <th>Categoria</th>     {# Coluna Nome da Categoria #}
+                    <th>Parcela</th>       {# Coluna Informação de Parcela #}
+                    <th>Pagamento</th>     {# Coluna Tipo de Pagamento (cabeçalho mais curto) #}
+                </tr>
+            </thead>
+            {# Corpo da tabela. #}
+            <tbody>
+                {# Loop Jinja: Itera sobre cada objeto 'conta' na lista 'contas_mes' (passada pelo backend). #}
+                {% for conta in contas_mes %}
+                   {# Linha da tabela para uma conta.
+                       - Adiciona a classe 'table-warning' (fundo amarelo) se a conta tiver vencimento E este for anterior à data de hoje ('hoje').
+                         Isso destaca contas potencialmente vencidas (relativo ao dia que o relatório é visto). #}
+                    <tr class="{{ 'table-warning' if conta.vencimento and hoje and conta.vencimento < hoje else '' }}">
+                        <td>{{ conta.nome }}</td> {# Nome da conta. #}
+                        {# Valor formatado, alinhado à direita (`text-right`). #}
+                        <td class="text-right">{{ formatar_br(conta.valor) }}</td>
+                        {# Data de vencimento formatada (DD/MM/YYYY) ou 'N/A', centralizada (`text-center`). #}
+                        <td class="text-center">{{ conta.vencimento.strftime('%d/%m/%Y') if conta.vencimento else 'N/A' }}</td>
+                        {# Nome da categoria (assume que 'categoria_nome' foi adicionado ao objeto 'conta' no backend) ou 'Sem Categoria'. #}
+                        <td>{{ conta.categoria_nome if conta.categoria_nome else 'Sem Categoria' }}</td>
+                        {# Informação da parcela (ex: "1/12"), centralizada. Usa um método do objeto 'conta'. #}
+                        <td class="text-center">{{ conta.get_parcela_display() }}</td>
+                        {# Nome do tipo de pagamento, obtido via função helper `get_tipo_pagamento_nome` (passada pelo backend ou definida globalmente). #}
+                        <td>{{ get_tipo_pagamento_nome(conta.tipo_pagamento_id) }}</td>
+                    </tr>
+                {% endfor %}
+
+                {# Linha única indicando que nenhuma conta foi encontrada para os filtros/período.
+                    Será exibida APENAS se a lista 'contas_mes' estiver vazia. #}
+                {% if not contas_mes %}
+                    <tr>
+                        <td colspan="6" class="text-center font-italic text-muted py-4">Nenhuma conta encontrada para este período e filtros.</td>
+                    </tr>
+                {% endif %}
+
+                 {# --- Linha de Rodapé com Total --- #}
+                 {# Exibe esta linha apenas se houver contas na lista 'contas_mes'. #}
+                 {% if contas_mes %}
+                 {# Linha de rodapé da tabela com fundo claro e texto em negrito. #}
+                 <tr class="table-light font-weight-bold">
+                     {# Célula que se estende por 5 colunas, alinhada à direita, com o texto "Total do Período:". #}
+                     <td colspan="5" class="text-right">Total do Período:</td>
+                     {# Célula final exibindo o total do mês formatado, alinhado à direita e destacado em vermelho (ou preto na impressão). #}
+                     <td class="text-right text-danger">{{ formatar_br(total_mes) }}</td>
+                 </tr>
+                 {% endif %} {# Fim do if contas_mes para a linha de total. #}
+            </tbody> {# Fim do corpo da tabela. #}
+        </table> {# Fim da tabela. #}
+    </div> {# Fim do container da tabela de detalhes. #}
+
+    {# --- Rodapé com Botão Imprimir --- #}
+    {# Container para o botão de impressão, com margem superior e centralizado. #}
+    <div class="report-footer mt-4 text-center">
+         {# Botão que aciona a função de impressão do navegador via JavaScript inline.
+            - `onclick="window.print()"`: Chama a API de impressão do navegador.
+            - `class="btn btn-info print-button"`: Estilo Bootstrap (azul claro). `print-button` é usado pelos estilos de impressão para esconder este botão ao imprimir. #}
+         <button onclick="window.print()" class="btn btn-info print-button">
+             {# Ícone Font Awesome de impressora com margem direita. #}
+             <i class="fas fa-print mr-1"></i> Imprimir Relatório
+         </button>
+    </div>
+
+    {# --- Estilo CSS Específico para Impressão --- #}
+    {# Bloco de estilos que só se aplica durante a impressão (`@media print`). #}
+    <style>
+        @media print {
+            /* Reset básico para impressão */
+            body, html { margin: 0; padding: 0; }
+            body * { visibility: hidden; } /* Esconde TUDO por padrão na impressão */
+
+            /* Torna o conteúdo do relatório (e seus filhos) visível novamente */
+            .report-container, .report-container * { visibility: visible; }
+            .card, .card * { visibility: visible; } /* Torna o card de resumo visível */
+            h1, h2, h3, h4, h5, p, .lead, .alert-info { visibility: visible; } /* Torna títulos e textos importantes visíveis */
+
+            /* Posiciona o conteúdo principal para ocupar a página de impressão */
+            .content { position: absolute; left: 0; top: 0; width: 100%; padding: 15px; }
+            .report-container { width: 100%; margin: 0; padding: 0; } /* Garante que o container do relatório ocupe a largura */
+            .card { box-shadow: none; border: 1px solid #ccc; margin-bottom: 1rem !important; } /* Remove sombra e adiciona borda ao card */
+            .card-header { background-color: #eee !important; } /* Fundo claro para cabeçalho do card na impressão */
+
+            /* Esconde elementos indesejados na impressão (sidebar, navbar, botões, etc.) */
+            .sidebar, .navbar, .btn, .print-button, .alert-dismissible .close, form, .alert-info a {
+                display: none !important; /* Usa display: none para remover completamente do layout */
+            }
+
+            /* Estilização da tabela para impressão */
+            table { width: 100%; border-collapse: collapse; margin-bottom: 1rem; font-size: 9pt; } /* Tabela ocupa largura total, bordas colapsadas, fonte menor */
+            th, td { border: 1px solid #ddd !important; padding: 4px 6px; vertical-align: middle; } /* Adiciona bordas a todas as células, padding menor */
+            thead { display: table-header-group; background-color: #f2f2f2 !important; } /* Garante que o cabeçalho da tabela se repita em novas páginas */
+            tbody tr { page-break-inside: avoid; } /* Tenta evitar quebras de página dentro de uma linha da tabela */
+            .text-right { text-align: right; } /* Mantém alinhamento à direita */
+            .text-center { text-align: center; } /* Mantém alinhamento centralizado */
+            .text-danger { color: #000 !important; } /* Muda texto 'danger' para preto na impressão */
+            .badge { border: 1px solid #ccc; color: #000; background-color: #fff !important; padding: 2px 4px;} /* Estilo simples para badges na impressão */
+
+            /* Estilização de títulos para impressão */
+            h1 { font-size: 16pt; margin-bottom: 0.5rem; }
+            h2 { font-size: 14pt; margin-top: 1rem; margin-bottom: 0.5rem; }
+            h5 { font-size: 11pt; margin-bottom: 0.3rem;}
+            p, li { font-size: 10pt; }
+
+            /* Estilização da informação de filtro na impressão */
+            .alert-info { border: 1px dashed #ccc; padding: 5px; margin-bottom: 1rem !important; background-color: #f8f9fa !important; }
+
+             /* Garante que links sejam pretos e sem sublinhado na impressão */
+            a { color: #000 !important; text-decoration: none; }
+        }
+    </style>
+
+{# Fim do bloco 'content'. #}
+{% endblock %}

@@ -1,0 +1,81 @@
+{# Indica que este template herda ('estende') a estrutura e blocos do template 'base.html'. #}
+{% extends 'base.html' %}
+
+{# Define o conteúdo do bloco 'title', que geralmente está na tag <title> do 'base.html'. Especifica o título desta página. #}
+{% block title %}Editar Cartão{% endblock %}
+
+{# Início do bloco principal de conteúdo, chamado 'content'. O conteúdo aqui substituirá o bloco 'content' no 'base.html'. #}
+{% block content %}
+
+    <!-- Título principal visível na página, indicando a ação de edição. -->
+    <h1>Editar Cartão de Crédito</h1>
+
+    <!-- Início do formulário. method='POST' é usado para enviar os dados atualizados ao servidor. -->
+    <form method="POST">
+        {# Renderiza campos ocultos do formulário (ex: token CSRF para segurança, e possivelmente o ID do cartão sendo editado, se não estiver na URL). #}
+        {{ form.hidden_tag() }}
+
+        <!-- Container para agrupar label, input e erros do campo 'nome' (estilo Bootstrap). -->
+        <div class="form-group">
+            {# Renderiza a tag <label> para o campo 'nome'. #}
+            {{ form.nome.label }}
+            {# Renderiza o campo de input (<input>) para 'nome'.
+               - class="form-control": Aplica estilo Bootstrap.
+               - value=cartao.nome: Pré-preenche o campo com o valor atual do nome do cartão.
+                 Assume que um objeto 'cartao' foi passado do backend para o template. #}
+            {{ form.nome(class="form-control", value=cartao.nome) }}
+            {# Loop para exibir mensagens de erro de validação para o campo 'nome', se houver após a submissão. #}
+            {% for error in form.nome.errors %}
+                <!-- Exibe uma mensagem de erro. 'text-danger' (Bootstrap) deixa o texto vermelho. -->
+                <small class="text-danger">{{ error }}</small>
+            {% endfor %} {# Fim do loop de erros para 'nome'. #}
+        </div>
+
+        <!-- Container para o campo 'limite'. -->
+        <div class="form-group">
+            {# Renderiza a tag <label> para o campo 'limite'. #}
+            {{ form.limite.label }}
+            {# Renderiza o campo de input (<input>) para 'limite'.
+               - class="form-control": Estilo Bootstrap.
+               - value=cartao.limite: Pré-preenche o campo com o valor atual do limite do cartão.
+               - id="limite": ID único usado pelo JavaScript para aplicar a máscara.
+               - type="text": Usado como texto para permitir a máscara de formatação monetária via JavaScript. #}
+            {{ form.limite(class="form-control", value=cartao.limite, id="limite", type="text") }}
+            {# Loop para exibir erros de validação do campo 'limite', se houver. #}
+            {% for error in form.limite.errors %}
+                <!-- Exibe uma mensagem de erro para o limite. -->
+                <small class="text-danger">{{ error }}</small>
+            {% endfor %} {# Fim do loop de erros para 'limite'. #}
+        </div>
+
+        {# Renderiza o botão de submissão do formulário (ex: "Salvar Alterações"). 'btn btn-primary' aplica estilo Bootstrap de botão principal. #}
+        {{ form.submit(class="btn btn-primary") }}
+        <!-- Link (estilizado como botão secundário) para cancelar a edição e retornar à lista de cartões.
+             `url_for('listar_cartoes')` gera o link dinamicamente para a rota/view correspondente. -->
+        <a href="{{ url_for('listar_cartoes') }}" class="btn btn-secondary">Cancelar</a>
+    <!-- Fim do formulário. -->
+    </form>
+{# Fim do bloco 'content'. #}
+{% endblock %}
+
+{# Início do bloco 'scripts'. Este bloco permite adicionar JavaScript específico para esta página no final do <body> (conforme definido em 'base.html'). #}
+{% block scripts %}
+    <!-- Início do bloco de código JavaScript. -->
+    <script>
+      // Executa o código dentro desta função apenas quando o DOM (a página HTML) estiver completamente carregado (usando jQuery).
+      $(document).ready(function() {
+        // Seleciona o elemento com id='limite' (o campo de input do limite) usando jQuery
+        // e aplica uma máscara de formatação monetária brasileira (provavelmente usando o plugin jQuery Mask).
+        // '000.000.000.000.000,00' define o padrão da máscara.
+        // 'reverse: true' aplica a máscara da direita para a esquerda, facilitando a digitação de valores.
+        $('#limite').mask('000.000.000.000.000,00', { reverse: true });
+
+        // Garante que a máscara seja aplicada corretamente ao valor inicial carregado no campo
+        // Dispara um evento 'input' para forçar a re-aplicação da máscara após o carregamento.
+        // (Opcional, mas útil se o valor inicial não estiver formatado corretamente pelo mask ao carregar)
+         $('#limite').trigger('input');
+      });
+    </script>
+    <!-- Fim do bloco de código JavaScript. -->
+{# Fim do bloco 'scripts'. #}
+{% endblock %}

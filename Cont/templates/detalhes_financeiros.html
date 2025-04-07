@@ -1,0 +1,97 @@
+{# Indica que este template herda a estrutura e blocos do template 'base.html'. #}
+{% extends 'base.html' %}
+
+{# Define o título da página, que aparecerá na aba do navegador.
+   Este bloco substitui o bloco 'title' definido no 'base.html'. #}
+{% block title %}Detalhes Financeiros{% endblock %}
+
+{# Início do bloco principal de conteúdo ('content').
+   Este bloco substitui o bloco 'content' definido no 'base.html'. #}
+{% block content %}
+    {# Título principal da página, exibido em destaque. #}
+    <h1>Detalhes Financeiros</h1>
+
+    {# --- Seção: Contas Bancárias --- #}
+    {# Título da seção de contas bancárias. #}
+    <h2>Contas Bancárias</h2>
+
+    {# Condição: Verifica se a lista 'contas_bancarias' (passada pelo backend) não está vazia. #}
+    {% if contas_bancarias %}
+        {# Lista não ordenada (<ul>) estilizada com classes do Bootstrap para exibir as contas bancárias.
+           `mb-4` adiciona margem inferior. #}
+        <ul class="list-group mb-4">
+            {# Loop Jinja: Itera sobre cada objeto 'conta' na lista 'contas_bancarias'. #}
+            {% for conta in contas_bancarias %}
+                {# Item da lista estilizado com classes do Bootstrap.
+                   `d-flex`: Usa Flexbox para layout.
+                   `justify-content-between`: Espaça os elementos horizontalmente (nome à esquerda, saldo à direita).
+                   `align-items-center`: Centraliza os elementos verticalmente. #}
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                    {# Container (<div>) para o nome e o saldo, empilhados verticalmente com <br>. #}
+                    <div>
+                        {{ conta.nome }}  {# Exibe o nome da conta bancária. #}
+                        <br> {# Quebra de linha para exibir o saldo abaixo do nome. #}
+                        Saldo: {{ formatar_br(conta.saldo) }}  {# Exibe o saldo formatado como moeda brasileira (BRL). #}
+                    </div>
+                </li>
+            {% endfor %} {# Fim do loop através das contas bancárias. #}
+        </ul> {# Fim da lista não ordenada de contas bancárias. #}
+        {# Parágrafo exibindo o total em contas bancárias. `lead` aumenta o tamanho da fonte. #}
+        <p class="lead">Total em Contas Bancárias: <strong>{{ formatar_br(total_conta_bancaria) }}</strong></p>
+    {# Bloco 'else' do 'if contas_bancarias': Exibido se não houver contas bancárias cadastradas. #}
+    {% else %}
+        {# Alerta Bootstrap informativo indicando que nenhuma conta bancária foi encontrada. #}
+        <div class="alert alert-info">Nenhuma conta bancária cadastrada.</div>
+    {% endif %} {# Fim do bloco condicional para contas bancárias. #}
+
+    {# --- Seção: Cartões de Crédito --- #}
+    {# Título da seção de cartões de crédito. #}
+    <h2>Cartões de Crédito</h2>
+
+    {# Condição: Verifica se a lista 'cartoes' (passada pelo backend) não está vazia. #}
+    {% if cartoes %}
+        {# Lista não ordenada (<ul>) estilizada com classes do Bootstrap para exibir os cartões de crédito.
+           `mb-4` adiciona margem inferior. #}
+        <ul class="list-group mb-4">
+            {# Loop Jinja: Itera sobre cada objeto 'cartao' na lista 'cartoes'. #}
+            {% for cartao in cartoes %}
+                {# Item da lista estilizado com classes do Bootstrap. #}
+                <li class="list-group-item">
+                    {# Exibe o nome do cartão em negrito. #}
+                    <strong>{{ cartao.nome }}</strong>
+                    <br> {# Quebra de linha. #}
+                    {# Exibe o limite disponível formatado como moeda brasileira. #}
+                    Limite Disponível: {{ formatar_br(cartao.limite_disponivel) }}
+                    <br> {# Quebra de linha. #}
+                    {# Título da lista de compras do cartão. #}
+                    Compras:
+                    {# Condição: Verifica se o cartão tem compras associadas (lista 'cartao.compras' não está vazia). #}
+                    {% if cartao.compras %}
+                        {# Lista não ordenada (<ul>) para exibir as compras do cartão. #}
+                        <ul>
+                            {# Loop Jinja: Itera sobre cada objeto 'compra' na lista 'cartao.compras'. #}
+                            {% for compra in cartao.compras %}
+                                {# Item da lista representando uma compra. #}
+                                <li>
+                                    {# Exibe o nome da compra, o valor total e o valor da parcela, todos formatados. #}
+                                    {{ compra.nome }} - Valor Total: {{ formatar_br(compra.valor_total_compra) }} - Parcela: {{ formatar_br(compra.valor) }}
+                                </li>
+                            {% endfor %} {# Fim do loop através das compras do cartão. #}
+                        </ul> {# Fim da lista não ordenada de compras. #}
+                    {# Bloco 'else' do 'if cartao.compras': Exibido se o cartão não tiver compras cadastradas. #}
+                    {% else %}
+                        {# Mensagem indicando que nenhuma compra foi cadastrada para este cartão. #}
+                        Nenhuma compra cadastrada.
+                    {% endif %} {# Fim do bloco condicional para compras do cartão. #}
+                </li>
+            {% endfor %} {# Fim do loop através dos cartões de crédito. #}
+        </ul> {# Fim da lista não ordenada de cartões de crédito. #}
+        {# Parágrafo exibindo o limite total disponível nos cartões. `lead` aumenta o tamanho da fonte. #}
+        <p class="lead">Limite Total Disponível nos Cartões: <strong>{{ formatar_br(total_cartao) }}</strong></p>
+    {# Bloco 'else' do 'if cartoes': Exibido se não houver cartões de crédito cadastrados. #}
+    {% else %}
+        {# Alerta Bootstrap informativo indicando que nenhum cartão de crédito foi encontrado. #}
+        <div class="alert alert-info">Nenhum cartão de crédito cadastrado.</div>
+    {% endif %} {# Fim do bloco condicional para cartões de crédito. #}
+{# Fim do bloco principal de conteúdo ('content'). #}
+{% endblock %}

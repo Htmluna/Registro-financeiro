@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+
+{% block title %}Adicionar Cartão{% endblock %}
+
+{% block content %}
+
+    <h1>Adicionar Cartão de Crédito</h1>
+
+    <form method="POST">
+        {{ form.hidden_tag() }}
+        <div class="form-group">
+            {{ form.nome.label }}
+            {{ form.nome(class="form-control") }}
+            {% for error in form.nome.errors %}
+                <small class="text-danger">{{ error }}</small>
+            {% endfor %}
+        </div>
+        <div class="form-group">
+            {{ form.limite.label }}
+            {{ form.limite(class="form-control", id="limite", type="text") }}
+            {% for error in form.limite.errors %}
+                <small class="text-danger">{{ error }}</small>
+            {% endfor %}
+        </div>
+        {{ form.submit(class="btn btn-primary") }}
+        <a href="{{ url_for('listar_cartoes') }}" class="btn btn-secondary">Cancelar</a>
+    </form>
+{% endblock %}
+
+{% block scripts %}  {# Adicionado bloco scripts #}
+    <script>
+      $(document).ready(function() {
+        $('#limite').mask('000.000.000.000.000,00', { reverse: true });
+      });
+    </script>
+{% endblock %}

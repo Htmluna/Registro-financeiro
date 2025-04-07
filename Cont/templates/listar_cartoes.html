@@ -1,0 +1,86 @@
+{# Indica que este template herda a estrutura e blocos do template 'base.html'. #}
+{% extends 'base.html' %}
+
+{# Define o título da página, que aparecerá na aba do navegador (substitui o bloco 'title' em base.html). #}
+{% block title %}Cartões de Crédito{% endblock %}
+
+{# Início do bloco principal de conteúdo ('content'). #}
+{% block content %}
+
+    {# Título principal visível na página. #}
+    <h1>Cartões de Crédito</h1>
+
+    {# Link (estilizado como botão primário Bootstrap) para a página de adicionar novo cartão.
+       `url_for('add_cartao')` gera o URL da rota/view correspondente.
+       `mb-3` adiciona uma margem inferior para espaçamento. #}
+    <a href="{{ url_for('add_cartao') }}" class="btn btn-primary mb-3">Adicionar Cartão</a>
+
+    {# Div container para tornar a tabela responsiva em telas menores (adiciona scroll horizontal se necessário). #}
+    <div class="table-responsive">
+        {# Tabela HTML com estilos Bootstrap: linhas listradas (`table-striped`) e efeito ao passar o mouse (`table-hover`). #}
+        <table class="table table-striped table-hover">
+            {# Cabeçalho da tabela. #}
+            <thead>
+            {# Linha do cabeçalho. #}
+            <tr>
+                <th>Nome</th>              {# Coluna para o nome do cartão. #}
+                <th>Limite Total</th>      {# Coluna para o limite total do cartão. #}
+                <th>Limite Disponível</th> {# Coluna para o limite disponível atual do cartão. #}
+                <th>Ações</th>             {# Coluna para os botões de ação (Editar, Excluir). #}
+            </tr>
+            </thead>
+            {# Corpo da tabela, onde os dados dos cartões serão listados. #}
+            <tbody>
+            {# Loop Jinja: Itera sobre cada objeto 'cartao' na lista 'cartoes' (passada pelo backend). #}
+            {% for cartao in cartoes %}
+                {# Linha da tabela representando um cartão de crédito. #}
+                <tr>
+                    {# Célula exibindo o nome do cartão. #}
+                    <td>{{ cartao.nome }}</td>
+                    {# Célula exibindo o limite total formatado como moeda brasileira (assume a existência da função/filtro `formatar_br`). #}
+                    <td>{{ formatar_br(cartao.limite) }}</td>
+                    {# Célula exibindo o limite disponível formatado. #}
+                    <td>{{ formatar_br(cartao.limite_disponivel) }}</td>
+                    {# Célula contendo os botões de ação para este cartão específico. #}
+                    <td>
+                        {# Botão Editar: É um link (`<a>`) estilizado como botão pequeno de contorno primário (azul).
+                           `url_for('edit_cartao', id=cartao.id)` gera o URL para a rota de edição, passando o ID do cartão. #}
+                        <a href="{{ url_for('edit_cartao', id=cartao.id) }}"
+                           class="btn btn-sm btn-outline-primary">Editar</a>
+                        {# Botão Excluir: É um pequeno formulário (`<form>`) que envia uma requisição POST para a rota de exclusão.
+                           `action="{{ url_for('delete_cartao', id=cartao.id) }}"` define o URL de destino, incluindo o ID do cartão.
+                           `method="post"` especifica o método HTTP.
+                           `style="display: inline;"` faz com que o formulário não quebre a linha, mantendo o botão ao lado do de editar. #}
+                        <form action="{{ url_for('delete_cartao', id=cartao.id) }}" method="post"
+                              style="display: inline;">
+                            {# O botão que, quando clicado, submete o formulário.
+                               `type="submit"`: Define como botão de submissão.
+                               `class="btn btn-sm btn-outline-danger"`: Estilo Bootstrap para botão pequeno de contorno vermelho.
+                               `onclick="return confirm('Tem certeza que deseja excluir este cartão?');"`: Executa um JavaScript ANTES de submeter.
+                                  - `confirm(...)` abre uma caixa de diálogo de confirmação no navegador.
+                                  - Se o usuário clicar "OK", `confirm` retorna `true`, e a submissão do formulário prossegue (`return true`).
+                                  - Se o usuário clicar "Cancelar", `confirm` retorna `false`, e a submissão é cancelada (`return false`). #}
+                                    <!-- listar_cartoes.html -->
+                                    <button type="button" class="btn btn-sm btn-outline-danger" title="Excluir"
+                                            data-toggle="modal"
+                                            data-target="#confirmDeleteModal"
+                                            data-url-delete="{{ url_for('delete_cartao', id=cartao.id) }}"
+                                            data-item-name="{{ cartao.nome }}">
+                                        Excluir
+                                    </button>
+                        </form> {# Fim do formulário de exclusão. #}
+                    </td>
+                </tr>
+            {# Bloco `else` do loop `for`: Será executado se a lista `cartoes` estiver vazia. #}
+            {% else %}
+                {# Linha da tabela indicando que nenhum cartão foi encontrado.
+                   `colspan="4"` faz com que esta única célula ocupe a largura das 4 colunas definidas no cabeçalho. #}
+                <tr>
+                    <td colspan="4">Nenhum cartão cadastrado.</td>
+                </tr>
+            {% endfor %} {# Fim do loop `for cartao in cartoes`. #}
+            </tbody> {# Fim do corpo da tabela. #}
+        </table> {# Fim da tabela. #}
+    </div> {# Fim do container responsivo. #}
+{# Fim do bloco 'content'. #}
+{% endblock %}

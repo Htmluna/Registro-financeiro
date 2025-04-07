@@ -1,0 +1,121 @@
+{# Indica que este template herda a estrutura do template 'base.html'. #}
+{% extends 'base.html' %}
+
+{# Define o título específico para esta página (Seleção de Relatório). #}
+{% block title %}Selecionar Relatório Mensal{% endblock %}
+
+{# Início do bloco principal de conteúdo ('content'). #}
+{% block content %}
+    {# Título principal da página. #}
+    <h1>Selecionar Período e Categorias para Relatório</h1>
+
+    {# Início do formulário.
+       - method="GET": Os dados do formulário (mês, ano, categorias) serão anexados à URL como parâmetros de consulta (ex: ?mes=10&ano=2023&categoria_id=1&categoria_id=5).
+                       Isto é apropriado para solicitar dados (como um relatório) sem alterar o estado do servidor.
+       - action="{{ url_for('visualizar_relatorio_mensal') }}": Define o URL de destino para onde o formulário será enviado.
+                        `url_for` gera dinamicamente o URL para a rota/view chamada 'visualizar_relatorio_mensal'.
+       - class="mb-4 card card-body shadow-sm": Aplica estilos Bootstrap: margem inferior (mb-4), aparência de cartão (card, card-body) com sombra sutil (shadow-sm). #}
+    <form method="GET" action="{{ url_for('visualizar_relatorio_mensal') }}" class="mb-4 card card-body shadow-sm">
+        {# --- Seção: Seleção de Mês e Ano --- #}
+        {# Linha Bootstrap (`form-row`) para alinhar os campos horizontalmente. `align-items-end` alinha os itens na base. `mb-3` adiciona margem inferior. #}
+        <div class="form-row align-items-end mb-3">
+            {# Coluna Bootstrap para o seletor de Mês. Ocupa 4 de 12 colunas em telas médias ou maiores. #}
+            <div class="col-md-4">
+                {# Rótulo para o seletor de mês. #}
+                <label for="mes">Mês:</label>
+                {# Seletor dropdown (`<select>`) para o mês.
+                   - name="mes": O nome do parâmetro que será enviado na URL.
+                   - id="mes": ID para associar com o label.
+                   - class="form-control custom-select": Estilos Bootstrap para o dropdown. `custom-select` melhora a aparência padrão.
+                   - required: Atributo HTML5 que indica que este campo deve ser preenchido antes de submeter. #}
+                <select name="mes" id="mes" class="form-control custom-select" required>
+                    {# Loop Jinja: Itera sobre a lista 'meses' (passada pelo backend, contendo pares de número e nome do mês). #}
+                    {% for num, nome in meses %}
+                        {# Opção do dropdown.
+                           - value="{{ num }}": O valor enviado quando esta opção for selecionada (o número do mês).
+                           - Lógica de pré-seleção (selected):
+                             1. `request.args.get('mes')|int == num`: Verifica se um parâmetro 'mes' existe na URL atual (de uma submissão anterior) e se seu valor inteiro corresponde ao número do mês atual no loop.
+                             2. `(not request.args.get('mes') and num == mes_atual)`: Verifica se NÃO há parâmetro 'mes' na URL (primeira visita) E se o número do mês atual no loop é igual ao mês atual (passado pelo backend como 'mes_atual').
+                             3. Se qualquer uma das condições for verdadeira, adiciona o atributo 'selected' a esta opção. #}
+                        <option value="{{ num }}" {% if request.args.get('mes')|int == num or (not request.args.get('mes') and num == mes_atual) %}selected{% endif %}>{{ nome }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            {# Coluna Bootstrap para o seletor de Ano. #}
+            <div class="col-md-4">
+                {# Rótulo para o seletor de ano. #}
+                <label for="ano">Ano:</label>
+                {# Seletor dropdown (`<select>`) para o ano. Similar ao seletor de mês. #}
+                <select name="ano" id="ano" class="form-control custom-select" required>
+                    {# Loop Jinja: Itera sobre a lista 'anos' (passada pelo backend). #}
+                    {% for ano_opcao in anos %}
+                     {# Opção do dropdown.
+                        - value="{{ ano_opcao }}": O valor do ano a ser enviado.
+                        - Lógica de pré-seleção (selected): Similar à lógica do mês, verifica se 'ano' está na URL atual ou se é o ano atual padrão ('ano_atual'). #}
+                        <option value="{{ ano_opcao }}" {% if request.args.get('ano')|int == ano_opcao or (not request.args.get('ano') and ano_opcao == ano_atual) %}selected{% endif %}>{{ ano_opcao }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+             {# Coluna Bootstrap para o botão Gerar Relatório. #}
+             <div class="col-md-4">
+                 {# Botão para submeter o formulário.
+                    - type="submit": Define como botão de submissão.
+                    - class="btn btn-primary w-100": Estilo Bootstrap para botão primário (azul) que ocupa 100% da largura da sua coluna (`w-100`). #}
+                 <button type="submit" class="btn btn-primary w-100">Gerar Relatório</button>
+             </div>
+        </div> {# Fim da linha do formulário para mês/ano/botão. #}
+
+        {# --- Seção: Seleção de Categorias --- #}
+        {# Agrupamento Bootstrap para a seleção de categorias. `mb-3` adiciona margem inferior. #}
+        <div class="form-group mb-3">
+            {# Rótulo explicando a seção de categorias. #}
+            <label>Filtrar por Categorias (opcional, deixe desmarcado para incluir todas):</label>
+             {# Container div para as checkboxes de categoria.
+                - style="...": Aplica estilos CSS inline para criar uma caixa com altura máxima e barra de rolagem vertical (`overflow-y: auto`) se necessário.
+                                Inclui borda, padding, bordas arredondadas e um fundo levemente cinza para destaque. #}
+            <div style="max-height: 200px; overflow-y: auto; border: 1px solid #ced4da; padding: 15px; border-radius: .25rem; background-color: #f8f9fa;">
+                {# Verifica se a lista 'categorias_disponiveis' (passada pelo backend) contém itens. #}
+                {% if categorias_disponiveis %}
+                    {# Obtém a lista de IDs de categoria que foram selecionados na requisição anterior (se houver).
+                       `request.args.getlist('categoria_id')` pega TODOS os valores passados com o nome 'categoria_id' na URL. #}
+                    {% set selected_cats = request.args.getlist('categoria_id') %}
+                    {# Loop Jinja: Itera sobre cada objeto 'categoria' na lista 'categorias_disponiveis'. #}
+                    {% for categoria in categorias_disponiveis %}
+                        {# Wrapper Bootstrap para um conjunto de checkbox + label. #}
+                        <div class="form-check">
+                            {# Checkbox para uma categoria.
+                               - class="form-check-input": Estilo Bootstrap para o checkbox.
+                               - type="checkbox": Define como checkbox.
+                               - name="categoria_id": Nome do parâmetro. Múltiplas checkboxes com o mesmo nome enviarão uma lista de valores na URL GET.
+                               - value="{{ categoria.id }}": O valor enviado se esta checkbox for marcada (o ID da categoria).
+                               - id="cat-{{ categoria.id }}": ID único para associar com o label.
+                               - Lógica de pré-seleção (checked):
+                                 Verifica se o ID da categoria atual (convertido para string com `|string`, pois os valores da URL são strings)
+                                 está presente na lista `selected_cats` obtida anteriormente. Se sim, adiciona o atributo 'checked'. #}
+                            <input class="form-check-input" type="checkbox" name="categoria_id" value="{{ categoria.id }}" id="cat-{{ categoria.id }}"
+                                   {% if categoria.id|string in selected_cats %}checked{% endif %}>
+                            {# Rótulo associado ao checkbox. `for="cat-{{ categoria.id }}"` liga o label ao input pelo ID. #}
+                            <label class="form-check-label" for="cat-{{ categoria.id }}">
+                                {{ categoria.nome }} {# Exibe o nome da categoria. #}
+                            </label>
+                        </div>
+                    {% endfor %} {# Fim do loop de categorias. #}
+                {# Bloco `else` do `if categorias_disponiveis`: Executado se não houver categorias. #}
+                {% else %}
+                    {# Exibe uma mensagem indicando que não há categorias, com um link para adicioná-las. #}
+                    <p class="text-muted mb-0">Nenhuma categoria cadastrada. <a href="{{ url_for('add_categoria') }}">Adicionar categoria?</a></p>
+                {% endif %} {# Fim do bloco `if categorias_disponiveis`. #}
+            </div> {# Fim do container scrollável de categorias. #}
+        </div> {# Fim do form-group das categorias. #}
+
+         {# Container para o botão Voltar, com margem superior (`mt-2`). #}
+         <div class="mt-2">
+             {# O botão Gerar Relatório foi movido para a linha de cima (`form-row`). #}
+             {# <button type="submit" class="btn btn-primary">Gerar Relatório</button> #}
+             {# Link (estilizado como botão secundário) para voltar ao Dashboard. #}
+            <a href="{{ url_for('dashboard') }}" class="btn btn-secondary">Voltar para Dashboard</a>
+         </div>
+
+    </form> {# Fim do formulário. #}
+
+{% endblock %} {# Fim do bloco 'content'. #}

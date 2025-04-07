@@ -1,0 +1,89 @@
+{# templates/listar_categorias.html #}
+
+{# Indica que este template herda a estrutura e blocos do 'base.html'. #}
+{% extends 'base.html' %}
+
+{# Define o título específico para esta página, que aparecerá na aba do navegador. #}
+{% block title %}Gerenciar Categorias{% endblock %}
+
+{# Início do bloco principal de conteúdo ('content'). #}
+{% block content %}
+{# Título principal da página. #}
+<h1>Minhas Categorias</h1>
+
+{# Link (estilizado como botão primário Bootstrap) para a página de adicionar nova categoria.
+   `url_for('add_categoria')` gera o URL correto. `mb-3` adiciona margem inferior. #}
+<a href="{{ url_for('add_categoria') }}" class="btn btn-primary mb-3">
+    {# Ícone Font Awesome de 'mais'. #}
+    <i class="fas fa-plus"></i> Nova Categoria
+</a>
+
+{# Verifica se a lista 'categorias' (passada pelo backend) contém algum item. #}
+{% if categorias %}
+{# Container para tornar a tabela responsiva (adiciona scroll horizontal se necessário). #}
+<div class="table-responsive">
+    {# Tabela HTML com estilo Bootstrap de hover (`table-hover`). #}
+    <table class="table table-hover">
+        {# Cabeçalho da tabela. #}
+        <thead>
+            <tr>
+                {# Coluna para o nome da categoria. #}
+                <th>Nome da Categoria</th>
+                {# Coluna para as ações (botões), com largura fixa para melhor alinhamento. #}
+                <th style="width: 150px;">Ações</th>
+            </tr>
+        </thead>
+        {# Corpo da tabela, onde as categorias serão listadas. #}
+        <tbody>
+            {# Loop Jinja: Itera sobre cada objeto 'categoria' na lista 'categorias'. #}
+            {% for categoria in categorias %}
+            {# Linha da tabela para uma categoria específica. #}
+            <tr>
+                {# Célula exibindo o nome da categoria. #}
+                <td>{{ categoria.nome }}</td>
+                {# Célula contendo os botões de ação (Editar, Excluir). #}
+                <td>
+                    {# Botão Editar: Link (`<a>`) estilizado como botão pequeno (sm) de contorno primário (azul).
+                       `url_for('edit_categoria', id=categoria.id)` gera o link para a rota de edição desta categoria.
+                       `mr-1` adiciona uma pequena margem à direita. `title` adiciona um tooltip. #}
+                    <a href="{{ url_for('edit_categoria', id=categoria.id) }}" class="btn btn-sm btn-outline-primary mr-1" title="Editar">
+                        {# Ícone Font Awesome de editar. #}
+                        <i class="fas fa-edit"></i>
+                    </a>
+                    {# --- Botão Excluir (MODAL TRIGGER) --- #}
+                    {# Este botão abre o modal de confirmação definido em 'base.html' (ou em outro lugar).
+                       - type="button": Impede que o botão tente submeter um formulário inexistente.
+                       - class="btn btn-sm btn-outline-danger": Estilo Bootstrap para botão pequeno de contorno vermelho.
+                       - title="Excluir": Tooltip.
+                       - data-toggle="modal": Indica ao JavaScript do Bootstrap que este botão abre um modal.
+                       - data-target="#confirmDeleteModal": Especifica o ID do modal a ser aberto.
+                       - data-url-delete: Guarda a URL real para a exclusão desta categoria específica. O JS do modal usará isso para configurar o formulário de exclusão dentro do modal.
+                       - data-item-name: Guarda o nome da categoria. O JS do modal pode usar isso para exibir na mensagem de confirmação. #}
+                    <button type="button" class="btn btn-sm btn-outline-danger" title="Excluir"
+                            data-toggle="modal"
+                            data-target="#confirmDeleteModal"
+                            data-url-delete="{{ url_for('delete_categoria_route', id=categoria.id) }}"
+                            data-item-name="{{ categoria.nome }}">
+                        {# Ícone Font Awesome de lixeira. #}
+                        <i class="fas fa-trash-alt"></i>
+                    </button>
+                    {# --- FIM DA CORREÇÃO (Botão Excluir Modal Trigger) --- #}
+                </td>
+            </tr> {# Fim da linha da tabela para esta categoria. #}
+            {# ---- REMOVER O 'td' SOLTO QUE ESTAVA ABAIXO DA TR ---- #} {# Comentário original indicando uma correção #}
+            {% endfor %} {# Fim do loop 'for categoria in categorias'. #}
+        </tbody> {# Fim do corpo da tabela. #}
+    </table> {# Fim da tabela. #}
+</div> {# Fim do container responsivo. #}
+{# Bloco `else` do `if categorias`: Executado se a lista 'categorias' estiver vazia. #}
+{% else %}
+{# Exibe um alerta Bootstrap informativo. #}
+<div class="alert alert-info">
+    Você ainda não cadastrou nenhuma categoria. {# Mensagem indicando que não há categorias. #}
+    {# Link para a página de adicionar categoria. #}
+    <a href="{{ url_for('add_categoria') }}">Crie sua primeira categoria</a>.
+</div>
+{% endif %} {# Fim do bloco `if categorias`. #}
+
+{# Fim do bloco principal de conteúdo ('content'). #}
+{% endblock %}

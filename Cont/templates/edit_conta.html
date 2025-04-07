@@ -1,0 +1,216 @@
+{# Indica que este template herda a estrutura e blocos do template 'base.html'. #}
+{% extends 'base.html' %}
+
+{# Define o título da página. Usa a variável 'title' passada pelo backend,
+   ou 'Editar Conta' como padrão se 'title' não for fornecida (usando o filtro 'default'). #}
+{% block title %}{{ title | default('Editar Conta') }}{% endblock %}
+
+{# Início do bloco principal de conteúdo ('content'). #}
+{% block content %}
+
+    {# Título principal visível na página, também usando a variável 'title' com fallback. #}
+    <h1>{{ title | default('Editar Conta') }}</h1>
+
+    {# Início do formulário. method="POST" envia os dados para a mesma URL que renderizou a página. #}
+    {# WTForms (ou similar) geralmente lida com a URL de action correta para edição. #}
+    <form method="POST">
+        {# Renderiza campos ocultos essenciais, principalmente o token CSRF para segurança.
+           WTForms também pode incluir o ID do item sendo editado aqui, se configurado. #}
+        {{ form.hidden_tag() }}
+
+         {# --- Campo Nome --- #}
+         {# Agrupamento padrão Bootstrap para um campo de formulário. #}
+        <div class="form-group">
+            {# Renderiza a tag <label> para o campo 'nome'. Adiciona classe Bootstrap 'form-label'. #}
+            {{ form.nome.label(class="form-label") }}
+            {# Renderiza o campo <input> para 'nome'.
+               - WTForms preenche automaticamente o 'value' com os dados do objeto sendo editado.
+               - class="form-control": Estilo padrão Bootstrap.
+               - + (" is-invalid" if form.nome.errors else ""): Adiciona a classe 'is-invalid' (borda vermelha)
+                 SOMENTE SE houver erros de validação para este campo. #}
+            {{ form.nome(class="form-control" + (" is-invalid" if form.nome.errors else "")) }}
+            {# Bloco condicional: Exibe a seção de erros apenas se existirem erros para 'nome'. #}
+            {% if form.nome.errors %}
+                {# Container para mensagens de erro, estilizado pelo Bootstrap para aparecer abaixo do campo. #}
+                <div class="invalid-feedback">
+                    {# Loop através de cada erro na lista de erros do campo 'nome'. #}
+                    {% for error in form.nome.errors %}<span>{{ error }}</span>{% endfor %}
+                </div>
+            {% endif %} {# Fim do bloco de erros para 'nome'. #}
+        </div>
+         {# Valor Total da Compra #}
+        <div class="form-group">
+            {{ form.valor_total_compra.label(class="form-control-label") }}
+            {{ form.valor_total_compra(class="form-control"+ (" is-invalid" if form.valor_total_compra.errors else ""), id="valor_total_compra", type="text") }}
+            {% if form.valor_total_compra.errors %}
+                <ul class="invalid-feedback">
+                    {% for error in form.valor_total_compra.errors %}
+                        <li>{{ error }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        </div>
+        {# --- Campo Valor --- #}
+        <div class="form-group">
+            {# Renderiza a tag <label> para o campo 'valor'. #}
+            {{ form.valor.label(class="form-label") }}
+            {# Renderiza o campo <input> para 'valor'.
+               - WTForms preenche o 'value'.
+               - class="form-control ...": Aplica estilo Bootstrap e classe 'is-invalid' condicionalmente.
+               - id="valor": ID específico para que o JavaScript possa aplicar a máscara.
+               - type="text": ESSENCIAL para que a máscara JavaScript funcione corretamente, mesmo sendo um valor numérico. #}
+            {{ form.valor(class="form-control" + (" is-invalid" if form.valor.errors else ""), id="valor", type="text") }}
+             {# Bloco condicional para exibir erros de validação para 'valor'. #}
+             {% if form.valor.errors %}
+                <div class="invalid-feedback">
+                    {% for error in form.valor.errors %}<span>{{ error }}</span>{% endfor %}
+                </div>
+            {% endif %}
+        </div>
+
+        {# --- Campo Vencimento --- #}
+        {# Assume que 'vencimento' é um DateField ou similar em WTForms. #}
+        <div class="form-group">
+            {# Renderiza a tag <label> para 'vencimento'. #}
+            {{ form.vencimento.label(class="form-label") }}
+            {# Renderiza o campo <input type="date"> (ou similar) para 'vencimento'.
+               - WTForms preenche o 'value'.
+               - Aplica estilo Bootstrap e classe 'is-invalid' condicionalmente. #}
+            {{ form.vencimento(class="form-control" + (" is-invalid" if form.vencimento.errors else "")) }}
+             {# Bloco condicional para exibir erros de validação para 'vencimento'. #}
+             {% if form.vencimento.errors %}
+                <div class="invalid-feedback">
+                    {% for error in form.vencimento.errors %}<span>{{ error }}</span>{% endfor %}
+                </div>
+            {% endif %}
+        </div>
+
+        {# --- Campo Categoria ID (Dropdown/Select) --- #}
+        {# Assume que 'categoria_id' é um SelectField em WTForms. #}
+        <div class="form-group">
+            {# Renderiza a tag <label> para 'categoria_id'. #}
+            {{ form.categoria_id.label(class="form-label") }}
+            {# Renderiza o <select> para 'categoria_id'.
+               - WTForms seleciona a opção correta com base nos dados do objeto.
+               - class="form-control custom-select": Estilo Bootstrap para dropdowns.
+               - Adiciona 'is-invalid' condicionalmente. #}
+            {{ form.categoria_id(class="form-control custom-select" + (" is-invalid" if form.categoria_id.errors else "")) }}
+            {# Bloco condicional para exibir erros de validação para 'categoria_id'. #}
+            {% if form.categoria_id.errors %}
+                <div class="invalid-feedback">
+                    {% for error in form.categoria_id.errors %}<span>{{ error }}</span>{% endfor %}
+                </div>
+            {% endif %}
+            {# Texto de ajuda abaixo do campo, com um link para adicionar nova categoria (abre em nova aba). #}
+            <small class="form-text text-muted">Não encontrou a categoria? <a href="{{ url_for('add_categoria') }}" target="_blank">Adicione uma nova</a>.</small>
+        </div>
+
+        {# --- Campos Parcelas (Lado a Lado) --- #}
+        {# Usa 'form-row' do Bootstrap para colocar os próximos form-groups em linha. #}
+        <div class="form-row">
+             {# Campo Parcela Atual - Ocupa metade da linha em telas médias ou maiores (col-md-6). #}
+             <div class="form-group col-md-6">
+                {# Renderiza a tag <label> para 'parcela_atual'. #}
+                {{ form.parcela_atual.label(class="form-label") }}
+                {# Renderiza o <input> para 'parcela_atual'. Aplica estilo e 'is-invalid' condicional. #}
+                {{ form.parcela_atual(class="form-control" + (" is-invalid" if form.parcela_atual.errors else "")) }}
+                 {# Bloco de erros para 'parcela_atual'. #}
+                 {% if form.parcela_atual.errors %}
+                    <div class="invalid-feedback">
+                        {% for error in form.parcela_atual.errors %}<span>{{ error }}</span>{% endfor %}
+                    </div>
+                {% endif %}
+            </div>
+             {# Campo Total de Parcelas - Ocupa a outra metade da linha. #}
+             <div class="form-group col-md-6">
+                {# Renderiza a tag <label> para 'total_parcelas'. #}
+                {{ form.total_parcelas.label(class="form-label") }}
+                {# Renderiza o <input> para 'total_parcelas'. Aplica estilo e 'is-invalid' condicional. #}
+                {{ form.total_parcelas(class="form-control" + (" is-invalid" if form.total_parcelas.errors else "")) }}
+                 {# Bloco de erros para 'total_parcelas'. #}
+                 {% if form.total_parcelas.errors %}
+                    <div class="invalid-feedback">
+                        {% for error in form.total_parcelas.errors %}<span>{{ error }}</span>{% endfor %}
+                    </div>
+                {% endif %}
+            </div>
+        </div> {# Fim do 'form-row' para parcelas. #}
+
+        {# Exibe um erro específico relacionado a parcelas (se existir) como um alerta geral abaixo da linha.
+           Isso é útil para validações que envolvem múltiplos campos (ex: custom validator no Form). #}
+        {% if form.total_parcelas.errors %} {# Pode checar erros em qualquer um dos campos de parcela ou form.errors #}
+             {% for error in form.total_parcelas.errors %}
+                 {# Verifica se a mensagem de erro é exatamente esta. #}
+                 {% if error == 'Parcela atual não pode ser maior que o total de parcelas.' %}
+                    {# Exibe um alerta Bootstrap de perigo. #}
+                    <div class="alert alert-danger alert-sm">{{ error }}</div>
+                 {% endif %}
+             {% endfor %}
+         {% endif %}
+
+        {# --- Campo Recorrente (Checkbox) --- #}
+        {# Wrapper Bootstrap para checkboxes. 'mb-3' adiciona margem inferior. #}
+        <div class="form-group form-check mb-3">
+            {# Renderiza o <input type="checkbox">.
+               - WTForms define o estado 'checked' automaticamente.
+               - class="form-check-input": Estilo Bootstrap para checkbox.
+               - Adiciona 'is-invalid' condicionalmente (raro para checkbox, mas possível). #}
+            {{ form.recorrente(class="form-check-input" + (" is-invalid" if form.recorrente.errors else "")) }}
+            {# Renderiza a tag <label> para o checkbox.
+               - class="form-check-label": Estilo Bootstrap para o label do checkbox.
+               - IMPORTANTE: O input vem ANTES do label na estrutura HTML para o estilo funcionar. #}
+            {{ form.recorrente.label(class="form-check-label") }}
+            {# Bloco de erros para 'recorrente'. #}
+            {% if form.recorrente.errors %}
+                <div class="invalid-feedback">
+                    {% for error in form.recorrente.errors %}<span>{{ error }}</span>{% endfor %}
+                </div>
+            {% endif %}
+        </div>
+
+        {# --- Campo Tipo de Pagamento (Dropdown/Select) --- #}
+        {# Assume que 'tipo_pagamento' é um SelectField em WTForms. #}
+        <div class="form-group">
+            {# Renderiza a tag <label> para 'tipo_pagamento'. #}
+            {{ form.tipo_pagamento.label(class="form-label") }}
+            {# Renderiza o <select> para 'tipo_pagamento'.
+               - WTForms seleciona a opção correta.
+               - class="form-control custom-select": Estilo Bootstrap para dropdown.
+               - Adiciona 'is-invalid' condicionalmente. #}
+            {{ form.tipo_pagamento(class="form-control custom-select" + (" is-invalid" if form.tipo_pagamento.errors else "")) }}
+            {# Bloco de erros para 'tipo_pagamento'. #}
+            {% if form.tipo_pagamento.errors %}
+                 <div class="invalid-feedback">
+                    {% for error in form.tipo_pagamento.errors %}<span>{{ error }}</span>{% endfor %}
+                </div>
+            {% endif %}
+            {# Texto de ajuda abaixo do campo. #}
+            <small class="form-text text-muted">Selecione como esta conta impacta seu saldo/limite (opcional).</small>
+        </div>
+
+        {# Botão de submissão do formulário (Salvar). 'btn-primary' é o estilo azul do Bootstrap. #}
+        {{ form.submit(class="btn btn-primary") }}
+        {# Botão/Link para cancelar a edição e voltar para a página inicial ('index').
+           'url_for('index')' gera o URL da rota 'index'. 'btn-secondary' é o estilo cinza do Bootstrap. #}
+        <a href="{{ url_for('dashboard') }}" class="btn btn-secondary">Cancelar</a>
+    </form> {# Fim do formulário. #}
+{% endblock %} {# Fim do bloco 'content'. #}
+
+{# Início do bloco 'scripts'. Código JavaScript vai aqui. #}
+{% block scripts %}
+    {# IMPORTANTE: Inclui quaisquer scripts definidos no bloco 'scripts' do template pai ('base.html').
+       Se 'base.html' inclui jQuery ou Bootstrap JS, isso garante que eles ainda sejam carregados. #}
+    {{ super() }}
+    {# Inclui a biblioteca jQuery Mask Plugin diretamente (pode também estar em base.html). #}
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js"></script>
+    {# Script inline para esta página específica. #}
+    <script>
+      // Executa quando o DOM estiver pronto.
+      $(document).ready(function() {
+        // Seleciona o campo com id 'valor' e aplica a máscara de moeda brasileira.
+        $('#valor').mask('000.000.000.000.000,00', { reverse: true });
+          $('#valor_total_compra').mask('000.000.000.000.000,00', { reverse: true });
+        // Opcional: $('#valor').trigger('input'); // Para forçar a máscara no valor inicial se necessário.
+      });
+    </script>
+{% endblock %} {# Fim do bloco 'scripts'. #}

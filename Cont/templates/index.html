@@ -1,0 +1,176 @@
+{# Indica que este template herda a estrutura do 'base.html' #}
+{% extends 'base.html' %}
+
+{# Define o título específico para esta página (Dashboard) #}
+{% block title %}Dashboard - Gestão Financeira{% endblock %}
+
+{# Início do bloco principal de conteúdo ('content') #}
+{% block content %}
+
+    {# Container Flexbox (Bootstrap) para alinhar o título à esquerda e o botão à direita #}
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        {# Título principal da página #}
+        <h1>Dashboard</h1>
+        {# Link (estilizado como botão primário) para adicionar uma nova conta.
+           `url_for('add_conta')` gera o URL para a rota/view 'add_conta'. #}
+        <a href="{{ url_for('add_conta') }}" class="btn btn-primary">
+             {# Ícone Font Awesome de 'mais' com margem à direita (mr-1) #}
+             <i class="fas fa-plus-circle mr-1"></i>Adicionar Nova Conta
+        </a>
+    </div>
+
+    {# Parágrafo com estilo 'lead' (texto maior) e margem inferior (mb-4).
+       Exibe o total geral formatado pela função/filtro `formatar_br` (provavelmente para moeda BR).
+       Assume que `total_geral` é uma variável passada pelo backend. #}
+    <p class="lead mb-4">Total Geral de Contas Listadas: <strong>{{ formatar_br(total_geral) }}</strong></p>
+
+    {# --- Seção: Contas Bancárias Individuais --- #}
+    <h2>Contas Bancárias</h2>
+    {% if contas_bancarias %}
+        <ul class="list-group mb-4">
+            {% for conta in contas_bancarias %}
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                    {{ conta.nome }}
+                    <span class="badge badge-primary badge-pill">{{ formatar_br(conta.saldo) }}</span>
+                </li>
+            {% endfor %}
+        </ul>
+        <p class="lead">Total em Contas Bancárias: <strong>{{ formatar_br(total_conta_bancaria) }}</strong></p>
+    {% else %}
+        <div class="alert alert-info">Nenhuma conta bancária cadastrada.</div>
+    {% endif %}
+
+    {# --- Seção: Cartões de Crédito Individuais --- #}
+    <h2>Cartões de Crédito</h2>
+    {% if cartoes %}
+        <ul class="list-group mb-4">
+            {% for cartao in cartoes %}
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                    {{ cartao.nome }}
+                    <span class="badge badge-primary badge-pill" style="font-size: 90%;">{{ formatar_br(cartao.limite_disponivel) }}</span>
+                </li>
+            {% endfor %}
+        </ul>
+        <p class="lead">Limite Total Disponível nos Cartões: <strong>{{ formatar_br(total_cartao) }}</strong></p>
+    {% else %}
+        <div class="alert alert-info">Nenhum cartão de crédito cadastrado.</div>
+    {% endif %}
+
+    {# --- Seção: Total por Categoria --- #}
+    {# Título da seção #}
+    <h2>Totais por Categoria</h2>
+    {# Verifica se existe a variável `total_por_categoria` (provavelmente um dicionário) e se não está vazia. #}
+    {% if total_por_categoria %}
+        {# Container responsivo para a tabela (adiciona scroll horizontal em telas pequenas). Margem inferior (mb-4). #}
+        <div class="table-responsive mb-4">
+            {# Tabela Bootstrap com linhas listradas, efeito hover e tamanho compacto (table-sm). #}
+            <table class="table table-striped table-hover table-sm">
+                {# Cabeçalho da tabela com fundo claro (thead-light). #}
+                <thead class="thead-light">
+                <tr>
+                    <th>Categoria</th> {# Coluna Nome da Categoria #}
+                    <th>Total</th>     {# Coluna Total da Categoria #}
+                </tr>
+                </thead>
+                <tbody>
+                {# Loop através dos itens (categoria, total) do dicionário `total_por_categoria`.
+                   `|sort` ordena os itens (provavelmente pelo nome da categoria) para exibição consistente. #}
+                {% for categoria, total in total_por_categoria.items()|sort %}
+                    <tr>
+                        <td>{{ categoria }}</td> {# Exibe o nome da categoria #}
+                        <td>{{ formatar_br(total) }}</td> {# Exibe o total formatado para a categoria #}
+                    </tr>
+                {% endfor %} {# Fim do loop de totais por categoria #}
+                </tbody>
+            </table>
+        </div>
+    {% else %} {# Caso `total_por_categoria` esteja vazio ou não exista #}
+        {# Exibe um alerta informativo Bootstrap indicando que não há dados. #}
+        <div class="alert alert-info">Nenhuma conta encontrada para exibir totais por categoria.</div>
+    {% endif %} {# Fim do bloco if/else para totais por categoria #}
+
+    {# --- Seção: Tabela de Contas Agrupadas por Categoria --- #}
+    {# Verifica se existe a variável `contas_por_categoria` (provavelmente um dicionário onde a chave é a categoria e o valor é uma lista de contas) e se não está vazia. #}
+    {% if contas_por_categoria %}
+        {# Loop externo: Itera sobre cada categoria e a lista de contas correspondente.
+           `items()|sort` ordena os categorias (provavelmente pelo nome) antes de iterar. #}
+        {% for categoria, contas_na_categoria in contas_por_categoria.items()|sort %}
+            {# Exibe o nome da categoria atual como um título de seção #}
+            <h2>{{ categoria }}</h2>
+            {# Container responsivo para a tabela de contas detalhadas desta categoria. #}
+            <div class="table-responsive mb-4">
+                {# Tabela Bootstrap com efeito hover e tamanho compacto para exibir as contas. #}
+                <table class="table table-hover table-sm">
+                    {# Cabeçalho da tabela detalhada. #}
+                    <thead class="thead-light">
+                    <tr>
+                        <th>Nome</th>            {# Coluna Nome da Conta #}
+                        <th>Valor</th>           {# Coluna Valor da Conta #}
+                        <th>Vencimento</th>      {# Coluna Data de Vencimento #}
+                        <th>Parcela</th>         {# Coluna Informação de Parcela #}
+                        <th>Recorrente</th>      {# Coluna Indicadora de Recorrência #}
+                        <th>Tipo de Pagamento</th> {# Coluna Tipo de Pagamento (Débito, Crédito, etc.) #}
+                        {# Coluna de Ações com largura fixa para alinhar os botões #}
+                        <th style="width: 120px;">Ações</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {# Loop interno: Itera sobre cada objeto `conta` dentro da lista `contas_na_categoria`. #}
+                    {% for conta in contas_na_categoria %}
+                        {# Linha da tabela para uma conta individual.
+                           Adiciona a classe 'table-danger' (fundo vermelho) se:
+                           1. `conta.vencimento` existe (não é nulo).
+                           2. A variável `hoje` (data atual, passada pelo backend) existe.
+                           3. A data de vencimento da conta é anterior à data de hoje (vencida). #}
+                        <tr class="{{ 'table-danger' if conta.vencimento and hoje and conta.vencimento < hoje else '' }}">
+                            <td>{{ conta.nome }}</td> {# Exibe o nome da conta #}
+                            <td>{{ formatar_br(conta.valor) }}</td> {# Exibe o valor formatado da conta #}
+                            {# Exibe a data de vencimento formatada como DD/MM/YYYY se existir, senão exibe 'N/A'. #}
+                            <td>{{ conta.vencimento.strftime('%d/%m/%Y') if conta.vencimento else 'N/A' }}</td>
+                            {# Exibe a informação de parcela (ex: "1/12"). Assume que `conta` tem um método `get_parcela_display()`. #}
+                            <td>{{ conta.parcela_atual }}/{{ conta.total_parcelas }}</td>
+                            {# Exibe um badge (etiqueta) Bootstrap: 'Sim' (azul) se for recorrente, 'Não' (cinza) caso contrário. #}
+                            <td>
+                                {% if conta.recorrente %}<span class="badge badge-info">Sim</span>{% else %}<span class="badge badge-secondary">Não</span>{% endif %}
+                            </td>
+                             {# Exibe o nome do tipo de pagamento. Assume uma função/filtro `get_tipo_pagamento_nome` que busca o nome a partir do ID. #}
+                            <td>{{ get_tipo_pagamento_nome(conta.tipo_pagamento_id) }}</td>
+                            {# Célula contendo os botões de ação para esta conta #}
+                            <td>
+                                {# Botão Editar: Link estilizado como botão pequeno (sm) de contorno primário (outline-primary) com margem direita (mr-1).
+                                   `url_for('edit_conta', id=conta.id)` gera o URL para editar esta conta específica. #}
+                                <a href="{{ url_for('edit_conta', id=conta.id) }}" class="btn btn-sm btn-outline-primary mr-1" title="Editar">
+                                     {# Ícone Font Awesome de editar #}
+                                     <i class="fas fa-edit"></i>
+                                </a>
+                                {# --- Botão Excluir (MODAL TRIGGER) --- #}
+                                {# Este botão NÃO exclui diretamente. Ele abre o modal de confirmação.
+                                   - type="button": Evita submissão de formulário.
+                                   - btn-sm btn-outline-danger: Estilo de botão pequeno, contorno vermelho.
+                                   - data-toggle="modal": Ativa a funcionalidade de modal do Bootstrap.
+                                   - data-target="#confirmDeleteModal": Especifica qual modal (pelo ID) deve ser aberto.
+                                   - data-url-delete: Atributo customizado que guarda a URL REAL de exclusão para esta conta. O JavaScript do modal usará isso.
+                                   - data-item-name: Atributo customizado que guarda o nome da conta. O JavaScript do modal pode usar isso para exibir na confirmação. #}
+                                <button type="button" class="btn btn-sm btn-outline-danger" title="Excluir"
+                                        data-toggle="modal"
+                                        data-target="#confirmDeleteModal"
+                                        data-url-delete="{{ url_for('delete_conta', id=conta.id) }}"
+                                        data-item-name="{{ conta.nome }}">
+                                    {# Ícone Font Awesome de lixeira #}
+                                    <i class="fas fa-trash-alt"></i>
+                                </button>
+                                {# --- Fim do Botão Excluir (MODAL TRIGGER) --- #}
+                            </td>
+                        </tr>
+                    {% endfor %} {# Fim do loop interno (contas) #}
+                    </tbody>
+                </table>
+            </div>
+        {% endfor %}
+    {% else %}
+         {# Exibe um alerta informativo com um link para adicionar a primeira conta. #}
+         <div class="alert alert-info">Nenhuma conta cadastrada ainda. <a href="{{ url_for('add_conta') }}">Adicione sua primeira conta!</a></div>
+    {% endif %}
+
+    {# Fim do bloco principal de conteúdo ('content') #}
+{% endblock %}
